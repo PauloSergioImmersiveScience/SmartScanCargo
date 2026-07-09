@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartScanCargo - Equalização Local</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <h1>SmartScanCargo</h1>
+      <p>Equalização histogrâmica local em imagens de raio-X de contêineres.</p>
+
+      <label for="passwordInput">Senha de acesso</label>
+      <input id="passwordInput" type="password" placeholder="Digite a senha" autocomplete="off" />
+
+      <button id="btnLogin" class="btn primary">Entrar</button>
+      <p id="loginStatus" class="status error"></p>
+    </div>
+  </section>
+
+  <main id="appScreen" class="container hidden">
+    <header class="header">
+      <div>
+        <h1>SmartScanCargo</h1>
+        <p class="descricao">
+          Clique em dois pontos da imagem para criar um bounding box. A equalização histogrâmica será aplicada apenas dentro dessa região.
+        </p>
+      </div>
+      <button id="btnLogout" class="btn ghost">Sair</button>
+    </header>
+
+    <section class="toolbar">
+      <div class="field-group">
+        <label for="imageLoader">Carregar imagem</label>
+        <input id="imageLoader" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" />
+      </div>
+
+      <div class="buttons">
+        <button id="btnRestore" class="btn secondary">Restaurar original</button>
+        <button id="btnDownload" class="btn success">Baixar imagem equalizada</button>
+      </div>
+    </section>
+
+    <section class="info-panel">
+      <p><strong>Imagem:</strong> <span id="imageName">imagens/xray-despadronizado.png</span></p>
+      <p><strong>Pontos selecionados:</strong> <span id="pointsCount">0</span>/2</p>
+      <p><strong>Último bounding box:</strong> <span id="bboxInfo">nenhum</span></p>
+    </section>
+
+    <section class="canvas-section">
+      <div id="canvasWrapper" class="canvas-wrapper">
+        <canvas id="imageCanvas"></canvas>
+      </div>
+    </section>
+
+    <section class="help-card">
+      <h2>Controles</h2>
+      <ul>
+        <li><strong>Clique esquerdo 1:</strong> define o ponto p1.</li>
+        <li><strong>Clique esquerdo 2:</strong> define o ponto p2 e equaliza o bounding box.</li>
+        <li><strong>Clique direito:</strong> restaura a imagem original.</li>
+        <li><strong>ESC:</strong> baixa a imagem equalizada atual.</li>
+      </ul>
+      <p id="statusText" class="status"></p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
