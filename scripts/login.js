@@ -5,13 +5,14 @@ import {
   passwordInput,
   loginStatus
 } from "./dom.js";
-import { loadDefaultImage } from "./imagem.js";
+import { setStatus } from "./ui.js";
 
 export function unlockApp() {
   sessionStorage.setItem(SESSION_KEY, "true");
   loginScreen.classList.add("hidden");
   appScreen.classList.remove("hidden");
-  loadDefaultImage();
+
+  setStatus("Clique em 'Carregar imagem' para escolher uma imagem do computador.");
 }
 
 export function lockApp() {

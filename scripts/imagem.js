@@ -1,4 +1,3 @@
-import { DEFAULT_IMAGE_PATH } from "./config.js";
 import {
   imageCanvas,
   ctx,
@@ -106,18 +105,10 @@ export function loadImageFromSource(src, fileName) {
   };
 
   img.onerror = function () {
-    setStatus(
-      "Não foi possível carregar a imagem padrão. " +
-      "Use o botão 'Carregar imagem'."
-    );
+    setStatus("Não foi possível abrir a imagem selecionada.");
   };
 
   img.src = src;
-}
-
-export function loadDefaultImage() {
-  if (state.originalImageData !== null) return;
-  loadImageFromSource(DEFAULT_IMAGE_PATH, DEFAULT_IMAGE_PATH);
 }
 
 export function restoreOriginalImage() {

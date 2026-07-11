@@ -4,5 +4,5 @@ export const state = {
   selectedPoints: [],
   previewPoint: null,
   lastBox: null,
-  currentFileName: "xray-despadronizado.png"
+  currentFileName: ""
 };
