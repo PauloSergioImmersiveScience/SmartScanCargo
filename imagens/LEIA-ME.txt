@@ -1,0 +1,6 @@
+Coloque nesta pasta a imagem padrão com o nome:
+
+xray-despadronizado.png
+
+Caminho esperado pelo sistema:
+imagens/xray-despadronizado.png
