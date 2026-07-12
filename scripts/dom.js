@@ -6,6 +6,8 @@ export const btnLogout = document.getElementById("btnLogout");
 export const loginStatus = document.getElementById("loginStatus");
 
 export const imageLoader = document.getElementById("imageLoader");
+export const exampleImageSelect = document.getElementById("exampleImageSelect");
+export const btnLoadExample = document.getElementById("btnLoadExample");
 export const imageCanvas = document.getElementById("imageCanvas");
 export const ctx = imageCanvas.getContext("2d", { willReadFrequently: true });
 
