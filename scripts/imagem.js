@@ -10,7 +10,7 @@ import {
   btnSuspect,
   hemdMissingModal,
   btnCloseHemdModal
-} from "./dom.js?v=12";
+} from "./dom.js?v=20";
 import { state } from "./state.js";
 import { resetSelection, setStatus } from "./ui.js";
 
@@ -89,7 +89,7 @@ export function showImageView(view) {
 
   if (view === "hemd" && !state.hemdImageData) {
     openMissingHemdModal();
-    setStatus("Não foi possível encontrar a imagem HEMD correspondente!");
+    setStatus("Nenhuma imagem hemd foi carregada!");
     updateViewButtons();
     return;
   }
@@ -197,6 +197,34 @@ export async function loadXrayOnlyFromSource(xraySrc, xrayFileName) {
   } catch (error) {
     console.error(error);
     setStatus(`Não foi possível carregar a imagem X-RAY: ${error.message}`);
+    throw error;
+  }
+}
+
+
+export async function loadHemdOnlyFromSource(hemdSrc, hemdFileName) {
+  if (!state.currentImageData) {
+    throw new Error("Carregue primeiro uma imagem X-RAY.");
+  }
+
+  try {
+    const hemdImg = await loadHtmlImage(hemdSrc);
+    const width = imageCanvas.width;
+    const height = imageCanvas.height;
+
+    hemdCanvas.width = width;
+    hemdCanvas.height = height;
+    hemdCtx.clearRect(0, 0, width, height);
+    hemdCtx.drawImage(hemdImg, 0, 0, width, height);
+
+    state.hemdImageData = hemdCtx.getImageData(0, 0, width, height);
+    state.hemdFileName = hemdFileName;
+
+    updateViewButtons();
+    setStatus(`Imagem HEMD carregada: ${hemdFileName}.`);
+  } catch (error) {
+    console.error(error);
+    setStatus(`Não foi possível carregar a imagem HEMD: ${error.message}`);
     throw error;
   }
 }

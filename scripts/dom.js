@@ -6,14 +6,19 @@ export const btnLogout = document.getElementById("btnLogout");
 export const loginStatus = document.getElementById("loginStatus");
 
 export const imageLoader = document.getElementById("imageLoader");
-export const localFileDisplay = document.getElementById("localFileDisplay");
 export const hemdLoader = document.getElementById("hemdLoader");
-export const exampleImageSelect = document.getElementById("exampleImageSelect");
-export const btnLoadExample = document.getElementById("btnLoadExample");
+export const localXrayDisplay = document.getElementById("localXrayDisplay");
+export const localHemdDisplay = document.getElementById("localHemdDisplay");
+
+export const exampleXraySelect = document.getElementById("exampleXraySelect");
+export const exampleHemdSelect = document.getElementById("exampleHemdSelect");
+export const btnLoadExampleXray = document.getElementById("btnLoadExampleXray");
+export const btnLoadExampleHemd = document.getElementById("btnLoadExampleHemd");
+
 export const imageCanvas = document.getElementById("imageCanvas");
 export const hemdCanvas = document.getElementById("hemdCanvas");
-export const ctx = imageCanvas.getContext("2d", { willReadFrequently: true });
-export const hemdCtx = hemdCanvas.getContext("2d", { willReadFrequently: true });
+export const ctx = imageCanvas.getContext("2d");
+export const hemdCtx = hemdCanvas.getContext("2d");
 
 export const imageNameText = document.getElementById("imageName");
 export const pointsCountText = document.getElementById("pointsCount");
