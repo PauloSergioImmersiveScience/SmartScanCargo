@@ -827,3 +827,10 @@ body.modal-open {
   padding-left: 18px;
   padding-right: 18px;
 }
+
+/* Destaque visual do botão Aplicar conforme referência */
+#btnConfigApply {
+  margin-left: 0;
+  margin-bottom: 8px;
+  box-shadow: 0 8px 0 #111827;
+}
