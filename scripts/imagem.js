@@ -46,30 +46,66 @@ export function getCanvasPoint(event) {
 
 export function updateViewButtons() {
   const hasXray = Boolean(state.currentImageData);
-  const hasHemd = Boolean(state.hemdImageData);
   const showingXray = state.activeView === "xray";
 
-  // O botão HEMD continua disponível quando há uma X-RAY carregada,
-  // mesmo que a imagem HEMD correspondente não exista. Nesse caso,
-  // o clique apenas informa ao usuário que ela não foi encontrada.
+  // O botão HEMD continua disponível quando existe uma X-RAY carregada.
+  // Caso a HEMD não exista, ele abre uma tela informativa no lugar da imagem.
   btnShowHemd.disabled = !hasXray || !showingXray;
-  btnShowXray.disabled = !hasXray || showingXray || !hasHemd;
+  btnShowXray.disabled = !hasXray || showingXray;
   btnSuspect.disabled = !hasXray || !showingXray;
+}
+
+function drawMissingHemdMessage() {
+  const width = hemdCanvas.width;
+  const height = hemdCanvas.height;
+  const message = "Não foi possível encontrar a imagem HEMD correspondente!";
+
+  hemdCtx.save();
+  hemdCtx.clearRect(0, 0, width, height);
+  hemdCtx.fillStyle = "#111827";
+  hemdCtx.fillRect(0, 0, width, height);
+
+  const fontSize = Math.max(18, Math.min(42, Math.round(width / 28)));
+  hemdCtx.font = `600 ${fontSize}px Arial`;
+  hemdCtx.textAlign = "center";
+  hemdCtx.textBaseline = "middle";
+  hemdCtx.fillStyle = "#ffffff";
+
+  const maxTextWidth = width * 0.82;
+  const words = message.split(" ");
+  const lines = [];
+  let currentLine = "";
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    if (hemdCtx.measureText(testLine).width <= maxTextWidth || !currentLine) {
+      currentLine = testLine;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+
+  const lineHeight = fontSize * 1.3;
+  const firstY = height / 2 - ((lines.length - 1) * lineHeight) / 2;
+
+  lines.forEach((line, index) => {
+    hemdCtx.fillText(line, width / 2, firstY + index * lineHeight);
+  });
+
+  hemdCtx.restore();
 }
 
 export function showImageView(view) {
   if (!state.currentImageData) return;
 
-  if (view === "hemd" && !state.hemdImageData) {
-    const message = "Não encontrei a correspondente HEMD";
-    setStatus(message);
-    window.alert(message);
-    updateViewButtons();
-    return;
-  }
-
   state.activeView = view === "hemd" ? "hemd" : "xray";
   const showingXray = state.activeView === "xray";
+
+  if (!showingXray && !state.hemdImageData) {
+    drawMissingHemdMessage();
+  }
 
   imageCanvas.classList.toggle("canvas-visible", showingXray);
   hemdCanvas.classList.toggle("canvas-visible", !showingXray);
@@ -78,8 +114,17 @@ export function showImageView(view) {
 
   resetSelection();
   updateViewButtons();
-  imageNameText.textContent = showingXray ? state.currentFileName : state.hemdFileName;
-  setStatus(showingXray ? "Visualizando a imagem X-RAY." : "Visualizando a imagem HEMD.");
+
+  if (showingXray) {
+    imageNameText.textContent = state.currentFileName;
+    setStatus("Visualizando a imagem X-RAY.");
+  } else if (state.hemdImageData) {
+    imageNameText.textContent = state.hemdFileName;
+    setStatus("Visualizando a imagem HEMD.");
+  } else {
+    imageNameText.textContent = "HEMD correspondente não encontrada";
+    setStatus("Não foi possível encontrar a imagem HEMD correspondente!");
+  }
 }
 
 export function redrawCanvas() {
