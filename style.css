@@ -507,3 +507,86 @@ canvas {
     width: 100% !important;
   }
 }
+
+/* ==========================================================
+   Janela modal do SmartScanCargo
+   ========================================================== */
+.app-modal[hidden] {
+  display: none;
+}
+
+.app-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.app-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.62);
+  backdrop-filter: blur(2px);
+}
+
+.app-modal__window {
+  position: relative;
+  z-index: 1;
+  width: min(430px, calc(100vw - 32px));
+  padding: 28px 28px 24px;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.38);
+  text-align: center;
+  animation: smartscan-modal-in 160ms ease-out;
+}
+
+.app-modal__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: #f4c430;
+  color: #1f2937;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.app-modal__window h2 {
+  margin: 0 0 10px;
+  color: #172033;
+  font-size: 21px;
+}
+
+.app-modal__window p {
+  margin: 0 0 22px;
+  color: #475569;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.app-modal__window .btn {
+  min-width: 100px;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+@keyframes smartscan-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmartScanCargo - Equalização Local</title>
-  <link rel="stylesheet" href="style.css?v=20260712-3" />
+  <link rel="stylesheet" href="style.css?v=20260712-4" />
 </head>
 <body>
   <section id="loginScreen" class="login-screen">
@@ -105,6 +105,32 @@
     </section>
   </main>
 
-  <script type="module" src="script.js?v=7"></script>
+
+  <div
+    id="hemdMissingModal"
+    class="app-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="hemdMissingModalTitle"
+    hidden
+  >
+    <div class="app-modal__backdrop" data-close-hemd-modal></div>
+
+    <div class="app-modal__window" role="document">
+      <div class="app-modal__icon" aria-hidden="true">!</div>
+
+      <h2 id="hemdMissingModalTitle">Imagem HEMD não encontrada</h2>
+
+      <p>
+        Não foi possível encontrar a imagem HEMD correspondente!
+      </p>
+
+      <button id="btnCloseHemdModal" class="btn primary" type="button">
+        OK
+      </button>
+    </div>
+  </div>
+
+  <script type="module" src="script.js?v=8"></script>
 </body>
 </html>
