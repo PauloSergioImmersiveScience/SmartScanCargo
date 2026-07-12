@@ -18,8 +18,9 @@ import {
   btnDownload,
   btnSuspect,
   btnShowHemd,
-  btnShowXray
-} from "./scripts/dom.js?v=40";
+  btnShowXray,
+  btnReport
+} from "./scripts/dom.js?v=50";
 
 import { state } from "./scripts/state.js";
 import { setStatus, resetSelection } from "./scripts/ui.js";
@@ -34,10 +35,11 @@ import {
   updateViewButtons
 } from "./scripts/imagem.js?v=40";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
-import { findPossibleSuspectRegions } from "./scripts/detector.js?v=40";
-import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=40";
+import { findPossibleSuspectRegions } from "./scripts/detector.js?v=50";
+import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=50";
 import { EXAMPLE_IMAGES, EXAMPLE_IMAGES_DIRECTORY } from "./scripts/examples.js?v=2";
 import { checkPassword, lockApp, restoreLoginState } from "./scripts/login.js";
+import { generateCurrentAnalysisReport } from "./scripts/report.js?v=50";
 
 btnLogin.addEventListener("click", checkPassword);
 passwordInput.addEventListener("keydown", (event) => {
@@ -95,6 +97,7 @@ imageLoader.addEventListener("change", async (event) => {
   }
 
   setLocalDisplay(localXrayDisplay, file.name);
+  btnReport.disabled = true;
   const url = URL.createObjectURL(file);
 
   try {
@@ -145,6 +148,7 @@ btnLoadExampleXray.addEventListener("click", async () => {
     return;
   }
 
+  btnReport.disabled = true;
   const url = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(example.xray)}`;
   await loadXrayOnlyFromSource(url, example.xray);
 
@@ -231,6 +235,7 @@ btnSuspect.addEventListener("click", async () => {
       `${currentResult.boxes.length} BB(s) do algoritmo atual e ` +
       `${fftBoxes.length} BB(s) do algoritmo FFT foram sobrepostos dentro da região R.`
     );
+    btnReport.disabled = false;
   } catch (error) {
     console.error(error);
     setStatus(`Não foi possível concluir a análise combinada: ${error.message}`);
@@ -241,6 +246,7 @@ btnSuspect.addEventListener("click", async () => {
 });
 
 btnDownload.addEventListener("click", downloadEqualizedImage);
+btnReport.addEventListener("click", generateCurrentAnalysisReport);
 
 window.addEventListener("keydown", (event) => {
   if (

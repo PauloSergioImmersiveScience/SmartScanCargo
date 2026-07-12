@@ -122,7 +122,7 @@
         <li><strong>Clique direito:</strong> restaura a imagem original.</li>
         <li><strong>Possible Suspected Regions:</strong> executa o algoritmo atual e a análise FFT, mostrando os bounding boxes vermelhos sobrepostos dentro da região R.</li>
         <li><strong>HEMD / X-RAY:</strong> alterna entre as duas imagens associadas, exibindo somente uma por vez.</li>
-        <li><strong>Emitir Relatório:</strong> reservado para uma implementação futura.</li>
+        <li><strong>Emitir Relatório:</strong> gera e baixa um PDF com a imagem X-RAY, os bounding boxes e o percentual de suspeita de cada região.</li>
         <li><strong>Bounding boxes vermelhos:</strong> são apenas indicações; a equalização continua sendo definida por dois cliques, dentro ou fora deles.</li>
         <li><strong>ESC:</strong> baixa a imagem equalizada atual.</li>
       </ul>
@@ -344,6 +344,7 @@
     </div>
   </div>
 
-  <script type="module" src="script.js?v=40"></script>
+  <script src="https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script type="module" src="script.js?v=50"></script>
 </body>
 </html>
