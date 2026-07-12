@@ -6,7 +6,7 @@ export const btnLogout = document.getElementById("btnLogout");
 export const loginStatus = document.getElementById("loginStatus");
 
 export const imageLoader = document.getElementById("imageLoader");
-export const localImageSelect = document.getElementById("localImageSelect");
+export const localFileDisplay = document.getElementById("localFileDisplay");
 export const hemdLoader = document.getElementById("hemdLoader");
 export const exampleImageSelect = document.getElementById("exampleImageSelect");
 export const btnLoadExample = document.getElementById("btnLoadExample");
