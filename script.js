@@ -21,6 +21,7 @@ import { setStatus, resetSelection } from "./scripts/ui.js";
 import {
   getCanvasPoint,
   loadImagePairFromSources,
+  loadXrayOnlyFromSource,
   redrawCanvas,
   restoreOriginalImage,
   downloadEqualizedImage,
@@ -85,7 +86,6 @@ btnLoadExample.addEventListener("click", async () => {
 });
 btnLoadExample.disabled = true;
 
-let pendingLocalXray = null;
 
 async function loadLocalPair(xrayFile, hemdFile) {
   const xrayURL = URL.createObjectURL(xrayFile);
@@ -127,36 +127,16 @@ imageLoader.addEventListener("change", async (event) => {
   }
 
   // Tenta usar automaticamente o HEMD publicado na pasta ImagensTest.
+  // Se ele não existir, a X-RAY é carregada normalmente e continua processável.
   const publishedHemdURL = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(expectedHemdName)}`;
   const xrayURL = URL.createObjectURL(xrayFile);
   try {
     await loadImagePairFromSources(xrayURL, publishedHemdURL, xrayFile.name, expectedHemdName);
-    URL.revokeObjectURL(xrayURL);
   } catch {
+    await loadXrayOnlyFromSource(xrayURL, xrayFile.name);
+  } finally {
     URL.revokeObjectURL(xrayURL);
-    pendingLocalXray = xrayFile;
-    hemdLoader.value = "";
-    setStatus(`Selecione agora o arquivo associado ${expectedHemdName}.`);
-    hemdLoader.click();
   }
-});
-
-hemdLoader.addEventListener("change", async (event) => {
-  const hemdFile = event.target.files?.[0];
-  if (!pendingLocalXray || !hemdFile) return;
-
-  const xrayIndex = extractIndex(pendingLocalXray.name, "xray");
-  const hemdIndex = extractIndex(hemdFile.name, "hemd");
-  if (!hemdIndex || hemdIndex !== xrayIndex) {
-    setStatus(`O arquivo HEMD deve ser hemd${xrayIndex}.png.`);
-    hemdLoader.value = "";
-    hemdLoader.click();
-    return;
-  }
-
-  const xrayFile = pendingLocalXray;
-  pendingLocalXray = null;
-  await loadLocalPair(xrayFile, hemdFile);
 });
 
 btnShowHemd.addEventListener("click", () => showImageView("hemd"));
