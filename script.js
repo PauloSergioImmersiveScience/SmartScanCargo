@@ -99,7 +99,7 @@ imageLoader.addEventListener("change", async (event) => {
   try {
     await loadXrayOnlyFromSource(url, file.name);
     hemdLoader.value = "";
-    setLocalDisplay(localHemdDisplay, "Selecione uma imagem HEMD");
+    setLocalDisplay(localHemdDisplay, "Selecione uma imagem HEMD correspondente");
   } finally {
     URL.revokeObjectURL(url);
   }
