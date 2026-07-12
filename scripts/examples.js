@@ -1,14 +1,10 @@
-// Imagens de demonstração armazenadas na pasta ImagensTest do repositório.
-// Para adicionar outro exemplo, envie o arquivo à pasta e acrescente uma entrada abaixo.
+// Pares de demonstração armazenados na pasta ImagensTest do repositório.
+// Para adicionar outro par, envie xray{i}.png e hemd{i}.png e acrescente uma entrada.
 export const EXAMPLE_IMAGES = [
-  { file: "xray16.png", label: "Raio-X 16" },
-  { file: "xray47.png", label: "Raio-X 47" },
-  { file: "xray57.png", label: "Raio-X 57" },
-  { file: "xray64.png", label: "Raio-X 64" },
-  { file: "hemd16.png", label: "Máscara HEMD 16" },
-  { file: "hemd47.png", label: "Máscara HEMD 47" },
-  { file: "hemd57.png", label: "Máscara HEMD 57" },
-  { file: "hemd64.png", label: "Máscara HEMD 64" }
+  { index: 16, xray: "xray16.png", hemd: "hemd16.png", label: "Raio-X 16" },
+  { index: 47, xray: "xray47.png", hemd: "hemd47.png", label: "Raio-X 47" },
+  { index: 57, xray: "xray57.png", hemd: "hemd57.png", label: "Raio-X 57" },
+  { index: 64, xray: "xray64.png", hemd: "hemd64.png", label: "Raio-X 64" }
 ];
 
 export const EXAMPLE_IMAGES_DIRECTORY = "./ImagensTest/";

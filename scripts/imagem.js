@@ -1,33 +1,73 @@
 import {
   imageCanvas,
+  hemdCanvas,
   ctx,
+  hemdCtx,
   imageNameText,
-  bboxInfoText
+  bboxInfoText,
+  btnShowHemd,
+  btnShowXray,
+  btnSuspect
 } from "./dom.js";
 import { state } from "./state.js";
 import { resetSelection, setStatus } from "./ui.js";
+
+function cloneImageData(imageData) {
+  return new ImageData(
+    new Uint8ClampedArray(imageData.data),
+    imageData.width,
+    imageData.height
+  );
+}
+
+function loadHtmlImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`Não foi possível abrir: ${src}`));
+    img.src = src;
+  });
+}
 
 export function getCanvasPoint(event) {
   const rect = imageCanvas.getBoundingClientRect();
   const xScreen = event.clientX - rect.left;
   const yScreen = event.clientY - rect.top;
 
-  if (
-    xScreen < 0 ||
-    yScreen < 0 ||
-    xScreen > rect.width ||
-    yScreen > rect.height
-  ) {
+  if (xScreen < 0 || yScreen < 0 || xScreen > rect.width || yScreen > rect.height) {
     return null;
   }
 
-  const scaleX = imageCanvas.width / rect.width;
-  const scaleY = imageCanvas.height / rect.height;
-
   return {
-    x: Math.round(xScreen * scaleX),
-    y: Math.round(yScreen * scaleY)
+    x: Math.round(xScreen * imageCanvas.width / rect.width),
+    y: Math.round(yScreen * imageCanvas.height / rect.height)
   };
+}
+
+export function updateViewButtons() {
+  const hasPair = Boolean(state.currentImageData && state.hemdImageData);
+  const showingXray = state.activeView === "xray";
+
+  btnShowHemd.disabled = !hasPair || !showingXray;
+  btnShowXray.disabled = !hasPair || showingXray;
+  btnSuspect.disabled = !state.currentImageData || !showingXray;
+}
+
+export function showImageView(view) {
+  if (!state.currentImageData || !state.hemdImageData) return;
+
+  state.activeView = view === "hemd" ? "hemd" : "xray";
+  const showingXray = state.activeView === "xray";
+
+  imageCanvas.classList.toggle("canvas-visible", showingXray);
+  hemdCanvas.classList.toggle("canvas-visible", !showingXray);
+  imageCanvas.setAttribute("aria-hidden", String(!showingXray));
+  hemdCanvas.setAttribute("aria-hidden", String(showingXray));
+
+  resetSelection();
+  updateViewButtons();
+  imageNameText.textContent = showingXray ? state.currentFileName : state.hemdFileName;
+  setStatus(showingXray ? "Visualizando a imagem X-RAY." : "Visualizando a imagem HEMD.");
 }
 
 export function redrawCanvas() {
@@ -35,8 +75,7 @@ export function redrawCanvas() {
 
   ctx.putImageData(state.currentImageData, 0, 0);
 
-  // Bounding boxes sugeridos pelo algoritmo de detecção.
-  if (state.suspectBoxes && state.suspectBoxes.length > 0) {
+  if (state.suspectBoxes?.length > 0) {
     ctx.save();
     ctx.strokeStyle = "#ff1f1f";
     ctx.fillStyle = "#ff1f1f";
@@ -57,12 +96,7 @@ export function redrawCanvas() {
     ctx.save();
     ctx.strokeStyle = "#00e5ff";
     ctx.lineWidth = Math.max(2, Math.round(imageCanvas.width / 700));
-    ctx.strokeRect(
-      state.lastBox.xMin,
-      state.lastBox.yMin,
-      state.lastBox.width,
-      state.lastBox.height
-    );
+    ctx.strokeRect(state.lastBox.xMin, state.lastBox.yMin, state.lastBox.width, state.lastBox.height);
     ctx.restore();
   }
 
@@ -85,69 +119,76 @@ export function redrawCanvas() {
   }
 }
 
-export function loadImageFromSource(src, fileName) {
-  const img = new Image();
+export async function loadImagePairFromSources(xraySrc, hemdSrc, xrayFileName, hemdFileName) {
+  try {
+    const [xrayImg, hemdImg] = await Promise.all([
+      loadHtmlImage(xraySrc),
+      loadHtmlImage(hemdSrc)
+    ]);
 
-  img.onload = function () {
-    imageCanvas.width = img.naturalWidth;
-    imageCanvas.height = img.naturalHeight;
+    const width = xrayImg.naturalWidth;
+    const height = xrayImg.naturalHeight;
 
-    ctx.drawImage(img, 0, 0);
+    imageCanvas.width = width;
+    imageCanvas.height = height;
+    hemdCanvas.width = width;
+    hemdCanvas.height = height;
 
-    state.originalImageData = ctx.getImageData(
-      0,
-      0,
-      imageCanvas.width,
-      imageCanvas.height
-    );
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(xrayImg, 0, 0, width, height);
 
-    state.currentImageData = new ImageData(
-      new Uint8ClampedArray(state.originalImageData.data),
-      state.originalImageData.width,
-      state.originalImageData.height
-    );
+    hemdCtx.clearRect(0, 0, width, height);
+    // A HEMD é redimensionada para ocupar exatamente W x H da X-RAY.
+    hemdCtx.drawImage(hemdImg, 0, 0, width, height);
 
-    state.currentFileName = fileName;
+    state.originalImageData = ctx.getImageData(0, 0, width, height);
+    state.currentImageData = cloneImageData(state.originalImageData);
+    state.hemdImageData = hemdCtx.getImageData(0, 0, width, height);
+    state.currentFileName = xrayFileName;
+    state.hemdFileName = hemdFileName;
+    state.activeView = "xray";
     state.lastBox = null;
     state.currentDetectorBoxes = [];
     state.fftDetectorBoxes = [];
     state.suspectBoxes = [];
 
-    imageNameText.textContent = fileName;
     bboxInfoText.textContent = "nenhum";
-
     resetSelection();
     redrawCanvas();
+    showImageView("xray");
 
     setStatus(
-      `Imagem carregada: ${fileName} ` +
-      `(${imageCanvas.width} x ${imageCanvas.height}).`
+      `Par carregado: ${xrayFileName} + ${hemdFileName} (${width} x ${height}).`
     );
-  };
+  } catch (error) {
+    console.error(error);
+    setStatus(`Não foi possível carregar o par X-RAY/HEMD: ${error.message}`);
+    throw error;
+  }
+}
 
-  img.onerror = function () {
-    setStatus("Não foi possível abrir a imagem selecionada.");
-  };
-
-  img.src = src;
+// Mantido por compatibilidade com chamadas antigas.
+export function loadImageFromSource(src, fileName) {
+  const match = fileName.match(/^xray(\d+)\.[^.]+$/i);
+  if (!match) {
+    setStatus("O arquivo deve seguir o padrão xray{i}.png.");
+    return;
+  }
+  const hemdName = `hemd${match[1]}.png`;
+  loadImagePairFromSources(src, `./ImagensTest/${hemdName}`, fileName, hemdName);
 }
 
 export function restoreOriginalImage() {
   if (!state.originalImageData) return;
 
-  state.currentImageData = new ImageData(
-    new Uint8ClampedArray(state.originalImageData.data),
-    state.originalImageData.width,
-    state.originalImageData.height
-  );
-
+  state.currentImageData = cloneImageData(state.originalImageData);
   state.lastBox = null;
   state.suspectBoxes = [];
   bboxInfoText.textContent = "nenhum";
 
   resetSelection();
   redrawCanvas();
-  setStatus("Imagem original restaurada.");
+  setStatus("Imagem X-RAY original restaurada.");
 }
 
 export function downloadEqualizedImage() {
@@ -156,16 +197,12 @@ export function downloadEqualizedImage() {
   const exportCanvas = document.createElement("canvas");
   exportCanvas.width = imageCanvas.width;
   exportCanvas.height = imageCanvas.height;
-
-  const exportCtx = exportCanvas.getContext("2d");
-  exportCtx.putImageData(state.currentImageData, 0, 0);
+  exportCanvas.getContext("2d").putImageData(state.currentImageData, 0, 0);
 
   const baseName = state.currentFileName.replace(/\.[^/.]+$/, "");
   const link = document.createElement("a");
-
   link.download = `${baseName}_equalizada_local.png`;
   link.href = exportCanvas.toDataURL("image/png");
   link.click();
-
   setStatus(`Download gerado: ${link.download}`);
 }
