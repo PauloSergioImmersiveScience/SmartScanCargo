@@ -623,3 +623,33 @@ body.modal-open {
 .app-modal__window {
   width: min(390px, calc(100vw - 32px));
 }
+
+/* Ajuste definitivo da largura dos quatro botões de carregamento */
+.four-upload-toolbar .upload-row {
+  grid-template-columns: 340px minmax(300px, 1fr) !important;
+}
+
+.four-upload-toolbar .upload-action {
+  width: 340px !important;
+  min-width: 340px !important;
+  max-width: 340px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  box-sizing: border-box;
+}
+
+@media (max-width: 760px) {
+  .four-upload-toolbar .upload-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .four-upload-toolbar .upload-action {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    white-space: normal !important;
+  }
+}
