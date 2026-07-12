@@ -1,3 +1,4 @@
+import "./scripts/settings.js?v=40";
 import {
   appScreen,
   passwordInput,
@@ -18,7 +19,7 @@ import {
   btnSuspect,
   btnShowHemd,
   btnShowXray
-} from "./scripts/dom.js?v=20";
+} from "./scripts/dom.js?v=40";
 
 import { state } from "./scripts/state.js";
 import { setStatus, resetSelection } from "./scripts/ui.js";
@@ -31,10 +32,10 @@ import {
   downloadEqualizedImage,
   showImageView,
   updateViewButtons
-} from "./scripts/imagem.js?v=20";
+} from "./scripts/imagem.js?v=40";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
-import { findPossibleSuspectRegions } from "./scripts/detector.js?v=6";
-import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=2";
+import { findPossibleSuspectRegions } from "./scripts/detector.js?v=40";
+import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=40";
 import { EXAMPLE_IMAGES, EXAMPLE_IMAGES_DIRECTORY } from "./scripts/examples.js?v=2";
 import { checkPassword, lockApp, restoreLoginState } from "./scripts/login.js";
 

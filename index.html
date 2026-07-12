@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmartScanCargo - Equalização Local</title>
-  <link rel="stylesheet" href="style.css?v=20260712-31" />
+  <link rel="stylesheet" href="style.css?v=20260712-40" />
 </head>
 <body>
   <section id="loginScreen" class="login-screen">
@@ -105,6 +105,7 @@
     </section>
 
     <section class="analysis-actions">
+      <button id="btnConfig" class="btn config-button">Configuração</button>
       <button id="btnSuspect" class="btn danger">Possible Suspected Regions</button>
       <button id="btnShowHemd" class="btn view-toggle" disabled>HEMD</button>
       <button id="btnShowXray" class="btn view-toggle" disabled>X-RAY</button>
@@ -147,6 +148,68 @@
     </div>
   </div>
 
-  <script type="module" src="script.js?v=20"></script>
+
+  <div id="configModal" class="app-modal config-modal" role="dialog" aria-modal="true" aria-labelledby="configModalTitle" hidden>
+    <div class="app-modal__backdrop" data-close-config-modal></div>
+    <div class="config-modal__window" role="document">
+      <header class="config-modal__header">
+        <div>
+          <h2 id="configModalTitle">Configuração dos Algoritmos</h2>
+          <p id="configActiveLabel">Configuração ativa: padrão</p>
+        </div>
+        <button id="btnConfigClose" class="config-close" type="button" aria-label="Fechar">×</button>
+      </header>
+      <form id="configForm" class="config-form">
+        <fieldset>
+          <legend>Detecção de regiões grandes despadronizadas</legend>
+          <div class="config-grid"><label class="config-field"><span>D</span><input name="current.D" type="number" step="0.01" /><small>Porcentagem vertical da região pré-segmentada R; 0 < D ≤ 1.</small></label>
+<label class="config-field"><span>ANALYSIS_WIDTH</span><input name="current.ANALYSIS_WIDTH" type="number" step="1" /></label>
+<label class="config-field"><span>MORPH_KERNEL_SIZE</span><input name="current.MORPH_KERNEL_SIZE" type="number" step="2" /></label>
+<label class="config-field"><span>MORPH_ITERATIONS</span><input name="current.MORPH_ITERATIONS" type="number" step="1" /></label>
+<label class="config-field"><span>WINDOW_RATIO</span><input name="current.WINDOW_RATIO" type="number" step="0.001" /></label>
+<label class="config-field"><span>TOP_N</span><input name="current.TOP_N" type="number" step="1" /></label>
+<label class="config-field"><span>N_BINS</span><input name="current.N_BINS" type="number" step="1" /><small>Número de bins do histograma de orientações.</small></label>
+<label class="config-check"><input name="current.SMOOTH" type="checkbox" /><span>SMOOTH</span></label>
+<label class="config-field"><span>GAUSS_K</span><input name="current.GAUSS_K" type="number" step="2" /></label>
+<label class="config-field"><span>GAUSS_SIG</span><input name="current.GAUSS_SIG" type="number" step="0.1" /></label>
+<label class="config-field"><span>EDGE_PERC</span><input name="current.EDGE_PERC" type="number" step="1" /><small>Percentil usado para selecionar bordas relevantes.</small></label>
+<label class="config-field"><span>GROUP_GAP_FACTOR</span><input name="current.GROUP_GAP_FACTOR" type="number" step="0.1" /><small>Agrupamento de janelas vizinhas.</small></label>
+<label class="config-field"><span>W_ENTROPY</span><input name="current.W_ENTROPY" type="number" step="0.1" /></label>
+<label class="config-field"><span>W_COHERENCE</span><input name="current.W_COHERENCE" type="number" step="0.1" /></label>
+<label class="config-field"><span>W_DENSITY</span><input name="current.W_DENSITY" type="number" step="0.1" /></label></div>
+        </fieldset>
+        <fieldset>
+          <legend>Detecção FFT de altas frequências</legend>
+          <div class="config-grid"><label class="config-field"><span>ANALYSIS_WIDTH</span><input name="fft.ANALYSIS_WIDTH" type="number" step="1" /></label>
+<label class="config-check"><input name="fft.APPLY_MORPHOLOGY" type="checkbox" /><span>APPLY_MORPHOLOGY</span></label>
+<label class="config-field"><span>MORPH_KERNEL_SIZE</span><input name="fft.MORPH_KERNEL_SIZE" type="number" step="2" /></label>
+<label class="config-field"><span>OPEN_ITERATIONS</span><input name="fft.OPEN_ITERATIONS" type="number" step="1" /></label>
+<label class="config-field"><span>CLOSE_ITERATIONS</span><input name="fft.CLOSE_ITERATIONS" type="number" step="1" /></label>
+<label class="config-field"><span>BB_AREA_MIN_PERCENT</span><input name="fft.BB_AREA_MIN_PERCENT" type="number" step="0.001" /></label>
+<label class="config-field"><span>MAX_COMPONENT_AREA</span><input name="fft.MAX_COMPONENT_AREA" type="number" step="1" /><small>Deixe vazio para não aplicar limite superior.</small></label>
+<label class="config-field"><span>BBOX_MARGIN</span><input name="fft.BBOX_MARGIN" type="number" step="1" /></label>
+<label class="config-field"><span>BBOX_THICKNESS</span><input name="fft.BBOX_THICKNESS" type="number" step="1" /></label>
+<label class="config-field"><span>EPS</span><input name="fft.EPS" type="number" step="any" /></label>
+<label class="config-field"><span>FFT_WINDOW_SIZE</span><input name="fft.FFT_WINDOW_SIZE" type="number" step="2" /></label>
+<label class="config-field"><span>FFT_STEP</span><input name="fft.FFT_STEP" type="number" step="1" /><small>Deixe vazio para usar FFT_WINDOW_SIZE // 2.</small></label>
+<label class="config-field"><span>HIGH_FREQ_RADIUS</span><input name="fft.HIGH_FREQ_RADIUS" type="number" step="0.01" /></label>
+<label class="config-field"><span>FFT_LOCAL_KERNEL_SIZE</span><input name="fft.FFT_LOCAL_KERNEL_SIZE" type="number" step="2" /></label>
+<label class="config-field"><span>FFT_ENERGY_ABS_MIN</span><input name="fft.FFT_ENERGY_ABS_MIN" type="number" step="0.01" /></label>
+<label class="config-field"><span>FFT_Z_THRESHOLD</span><input name="fft.FFT_Z_THRESHOLD" type="number" step="0.1" /></label>
+<label class="config-field"><span>FFT_SCORE_THRESHOLD</span><input name="fft.FFT_SCORE_THRESHOLD" type="number" step="0.01" /></label>
+<label class="config-check"><input name="fft.REQUIRE_FFT_DETECTOR" type="checkbox" /><span>REQUIRE_FFT_DETECTOR</span></label></div>
+        </fieldset>
+        <p id="configValidation" class="config-validation" role="alert"></p>
+        <footer class="config-actions">
+          <button id="btnConfigDefaults" class="btn secondary" type="button">Restaurar padrões</button>
+          <button id="btnConfigCancel" class="btn ghost" type="button">Cancelar</button>
+          <button id="btnConfigApply" class="btn primary" type="button">Aplicar</button>
+          <button id="btnConfigSave" class="btn success" type="button">Salvar configuração</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="script.js?v=40"></script>
 </body>
 </html>

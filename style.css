@@ -653,3 +653,104 @@ body.modal-open {
     white-space: normal !important;
   }
 }
+
+.config-button {
+  background: #475569;
+  color: #fff;
+}
+
+.config-modal__window {
+  position: relative;
+  z-index: 1;
+  width: min(1120px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, .42);
+}
+
+.config-modal__header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.config-modal__header h2 { margin: 0 0 4px; }
+.config-modal__header p { margin: 0; color: #64748b; }
+.config-close {
+  border: 0;
+  background: transparent;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.config-form { padding: 20px 24px 24px; }
+.config-form fieldset {
+  margin: 0 0 18px;
+  padding: 18px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+}
+.config-form legend {
+  padding: 0 8px;
+  font-weight: 700;
+  color: #1e293b;
+}
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(230px, 1fr));
+  gap: 13px 18px;
+}
+.config-field {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) 120px;
+  align-items: center;
+  gap: 8px;
+}
+.config-field input {
+  width: 100%;
+  padding: 7px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}
+.config-field small {
+  grid-column: 1 / -1;
+  color: #64748b;
+  line-height: 1.25;
+}
+.config-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+.config-validation {
+  min-height: 20px;
+  color: #b91c1c;
+  font-weight: 700;
+}
+.config-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+@media (max-width: 920px) {
+  .config-grid { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+}
+@media (max-width: 620px) {
+  .config-grid { grid-template-columns: 1fr; }
+  .config-field { grid-template-columns: 1fr; }
+  .config-actions .btn { flex: 1 1 45%; }
+}
+
