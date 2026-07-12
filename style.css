@@ -99,7 +99,7 @@ select:focus {
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(760px, 1fr) auto;
+  grid-template-columns: minmax(900px, 1fr) auto;
   grid-template-areas:
     "local-xray buttons"
     "local-hemd buttons"
@@ -112,7 +112,7 @@ select:focus {
 
 .upload-row {
   display: grid;
-  grid-template-columns: 220px minmax(280px, 1fr);
+  grid-template-columns: 310px minmax(280px, 1fr);
   gap: 6px;
   align-items: center;
   min-width: 0;
