@@ -407,3 +407,34 @@ canvas {
 .local-upload-action:hover {
   background: #dcae1f;
 }
+
+/* Ajustes finais da interface */
+
+/* Botão para carregar imagem do dispositivo: amarelo */
+.local-upload-action {
+  background: #f4c430 !important;
+  color: #1f2937 !important;
+}
+
+.local-upload-action:hover {
+  background: #dcae1f !important;
+}
+
+/* Botão vermelho ajustado ao tamanho do texto */
+.suspect-action {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.suspect-action .danger {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: max-content;
+  flex: 0 0 auto !important;
+  padding: 8px 18px;
+  white-space: nowrap;
+}
