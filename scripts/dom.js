@@ -25,3 +25,6 @@ export const btnSuspect = document.getElementById("btnSuspect");
 export const btnShowHemd = document.getElementById("btnShowHemd");
 export const btnShowXray = document.getElementById("btnShowXray");
 export const btnReport = document.getElementById("btnReport");
+
+export const hemdMissingModal = document.getElementById("hemdMissingModal");
+export const btnCloseHemdModal = document.getElementById("btnCloseHemdModal");
