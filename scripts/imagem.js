@@ -89,7 +89,7 @@ export function showImageView(view) {
 
   if (view === "hemd" && !state.hemdImageData) {
     openMissingHemdModal();
-    setStatus("Não foi possível encontrar a imagem HEMD correspondente!");
+    setStatus("Não foi possível encontrar a imagem HEMD correspondente! Ambas devem estar no mesmo diretório!");
     updateViewButtons();
     return;
   }
