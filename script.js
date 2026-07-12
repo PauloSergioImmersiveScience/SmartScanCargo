@@ -15,7 +15,7 @@ import {
   btnSuspect,
   btnShowHemd,
   btnShowXray
-} from "./scripts/dom.js";
+} from "./scripts/dom.js?v=12";
 
 import { state } from "./scripts/state.js";
 import { setStatus, resetSelection } from "./scripts/ui.js";
@@ -28,7 +28,7 @@ import {
   downloadEqualizedImage,
   showImageView,
   updateViewButtons
-} from "./scripts/imagem.js";
+} from "./scripts/imagem.js?v=12";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
 import { findPossibleSuspectRegions } from "./scripts/detector.js?v=6";
 import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=2";
