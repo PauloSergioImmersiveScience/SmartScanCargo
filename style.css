@@ -48,7 +48,8 @@ label {
 }
 
 input[type="password"],
-input[type="file"] {
+input[type="file"],
+select {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid #c9d2df;
@@ -58,7 +59,8 @@ input[type="file"] {
 }
 
 input[type="password"]:focus,
-input[type="file"]:focus {
+input[type="file"]:focus,
+select:focus {
   outline: none;
   border-color: #1f6feb;
   box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.14);
@@ -104,6 +106,33 @@ input[type="file"]:focus {
 
 .field-group {
   min-width: 260px;
+}
+
+.image-source-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.example-selector {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.example-selector select {
+  min-width: 0;
+  flex: 1;
+}
+
+.example {
+  flex: 0 0 auto;
+  background: #1f6feb;
+}
+
+.example:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .buttons {
@@ -222,6 +251,10 @@ canvas {
     grid-template-columns: 1fr;
   }
 
+  .image-source-grid {
+    grid-template-columns: 1fr;
+  }
+
   .buttons {
     justify-content: stretch;
   }
@@ -254,4 +287,14 @@ canvas {
 .danger:disabled {
   cursor: wait;
   opacity: 0.65;
+}
+
+@media (max-width: 560px) {
+  .example-selector {
+    flex-direction: column;
+  }
+
+  .example-selector .btn {
+    width: 100%;
+  }
 }

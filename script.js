@@ -15,6 +15,8 @@ import {
   btnLogin,        // Botão usado para entrar no sistema.
   btnLogout,       // Botão usado para sair do sistema.
   imageLoader,     // Campo usado para selecionar uma imagem do computador.
+  exampleImageSelect, // Lista de imagens exemplo armazenadas no GitHub.
+  btnLoadExample,  // Botão que carrega a imagem exemplo selecionada.
   imageCanvas,     // Canvas no qual a imagem é exibida e manipulada.
   pointsCountText, // Elemento que mostra quantos pontos foram selecionados.
   btnRestore,      // Botão que restaura a imagem original.
@@ -47,6 +49,12 @@ import { equalizeBoundingBox } from "./scripts/equalizacao.js";
 import { findPossibleSuspectRegions } from "./scripts/detector.js?v=5";
 import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=1";
 
+// Importa a relação de imagens exemplo presentes no repositório.
+import {
+  EXAMPLE_IMAGES,
+  EXAMPLE_IMAGES_DIRECTORY
+} from "./scripts/examples.js?v=1";
+
 // Importa as funções responsáveis pelo controle de acesso.
 import {
   checkPassword,    // Verifica se a senha digitada está correta.
@@ -76,6 +84,38 @@ btnLogout.addEventListener("click", lockApp);
 // ==========================================================
 // Evento de carregamento da imagem
 // ==========================================================
+// Preenche a lista com as imagens disponíveis na pasta ImagensTest.
+EXAMPLE_IMAGES.forEach((example) => {
+  const option = document.createElement("option");
+  option.value = example.file;
+  option.textContent = example.label;
+  exampleImageSelect.appendChild(option);
+});
+
+// Habilita o botão somente quando um exemplo estiver selecionado.
+exampleImageSelect.addEventListener("change", () => {
+  btnLoadExample.disabled = !exampleImageSelect.value;
+});
+
+// Carrega a imagem exemplo diretamente da pasta publicada no GitHub Pages.
+btnLoadExample.addEventListener("click", () => {
+  const fileName = exampleImageSelect.value;
+
+  if (!fileName) {
+    setStatus("Selecione uma imagem exemplo antes de carregar.");
+    return;
+  }
+
+  // Limpa a seleção local para deixar clara a origem da imagem atual.
+  imageLoader.value = "";
+
+  const imageURL = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(fileName)}`;
+  loadImageFromSource(imageURL, fileName);
+});
+
+// O botão inicia desabilitado porque ainda não existe exemplo selecionado.
+btnLoadExample.disabled = true;
+
 
 // Executa quando o usuário escolhe um arquivo no botão "Carregar imagem".
 imageLoader.addEventListener("change", (event) => {
@@ -84,6 +124,10 @@ imageLoader.addEventListener("change", (event) => {
 
   // Interrompe a função caso nenhum arquivo tenha sido selecionado.
   if (!file) return;
+
+  // Limpa a escolha de exemplo para deixar clara a origem da imagem atual.
+  exampleImageSelect.value = "";
+  btnLoadExample.disabled = true;
 
   // Cria um endereço temporário para o navegador acessar o arquivo local.
   const objectURL = URL.createObjectURL(file);

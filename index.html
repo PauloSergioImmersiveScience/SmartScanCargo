@@ -32,9 +32,21 @@
     </header>
 
     <section class="toolbar">
-      <div class="field-group">
-        <label for="imageLoader">Carregar imagem</label>
-        <input id="imageLoader" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" />
+      <div class="image-source-grid">
+        <div class="field-group">
+          <label for="imageLoader">Escolher arquivo do dispositivo</label>
+          <input id="imageLoader" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" />
+        </div>
+
+        <div class="field-group example-group">
+          <label for="exampleImageSelect">Escolher imagem exemplo do GitHub</label>
+          <div class="example-selector">
+            <select id="exampleImageSelect">
+              <option value="">Selecione uma imagem exemplo</option>
+            </select>
+            <button id="btnLoadExample" class="btn example" type="button">Carregar exemplo</button>
+          </div>
+        </div>
       </div>
 
       <div class="buttons">
@@ -62,6 +74,8 @@
     <section class="help-card">
       <h2>Controles</h2>
       <ul>
+        <li><strong>Escolher arquivo do dispositivo:</strong> abre uma imagem armazenada no computador, celular ou tablet.</li>
+        <li><strong>Imagem exemplo do GitHub:</strong> carrega uma das imagens disponíveis na pasta <code>ImagensTest</code> do projeto.</li>
         <li><strong>Clique esquerdo 1:</strong> define o ponto p1.</li>
         <li><strong>Clique esquerdo 2:</strong> define o ponto p2 e equaliza o bounding box.</li>
         <li><strong>Clique direito:</strong> restaura a imagem original.</li>
@@ -73,6 +87,6 @@
     </section>
   </main>
 
-  <script type="module" src="script.js?v=5"></script>
+  <script type="module" src="script.js?v=6"></script>
 </body>
 </html>
