@@ -9,7 +9,11 @@ import { setStatus } from "./ui.js";
 const D = 0.6;
 const MORPH_KERNEL_SIZE = 3;
 const MORPH_ITERATIONS = 10;
-const WINDOW_W = 450;
+// Largura interna fixa usada em todas as plataformas.
+const ANALYSIS_WIDTH = 1200;
+
+// Proporção da janela em relação à largura de referência do código Python.
+const WINDOW_RATIO = 450 / 4728;
 const TOP_N = 8;
 const N_BINS = 18;
 const SMOOTH = true;
@@ -21,9 +25,9 @@ const W_ENTROPY = 1.0;
 const W_COHERENCE = 1.0;
 const W_DENSITY = 1.0;
 
-// Limita a largura usada internamente para manter o navegador responsivo.
-// As coordenadas dos bounding boxes são reconvertidas para a imagem original.
-const MAX_ANALYSIS_WIDTH = 1800;
+// A imagem é sempre analisada com a mesma largura interna.
+// Isso evita resultados diferentes causados por resoluções distintas
+// entre desktop, celular ou versões redimensionadas da mesma imagem.
 
 function imageDataToGray(imageData) {
   const { width, height, data } = imageData;
@@ -307,8 +311,9 @@ function groupIntervals(intervals, maxGap) {
 function detectBoxes(imageData) {
   const originalW = imageData.width;
   const originalH = imageData.height;
-  const scale = Math.min(1, MAX_ANALYSIS_WIDTH / originalW);
-  const width = Math.max(3, Math.round(originalW * scale));
+  // Padroniza a resolução da análise em qualquer dispositivo.
+  const width = ANALYSIS_WIDTH;
+  const scale = width / originalW;
   const height = Math.max(3, Math.round(originalH * scale));
 
   const originalGray = imageDataToGray(imageData);
@@ -346,7 +351,8 @@ function detectBoxes(imageData) {
   const { gx, gy, mag, ang } = sobel(proc, width, roiH);
   const edgeThreshold = percentileApprox(mag, EDGE_PERC);
 
-  const windowW = Math.max(3, Math.min(width, Math.round(WINDOW_W * scale)));
+  // Mantém a janela proporcional à largura padronizada de análise.
+  const windowW = Math.max(3, Math.min(width, Math.round(width * WINDOW_RATIO)));
   const step = Math.max(1, Math.floor(windowW / 2));
   const xPositions = [];
   for (let x = 0; x <= width - windowW; x += step) xPositions.push(x);

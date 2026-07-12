@@ -44,7 +44,7 @@ import {
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
 
 // Importa a detecção automática de possíveis regiões suspeitas.
-import { findPossibleSuspectRegions } from "./scripts/detector.js";
+import { findPossibleSuspectRegions } from "./scripts/detector.js?v=4";
 
 // Importa as funções responsáveis pelo controle de acesso.
 import {
