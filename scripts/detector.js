@@ -391,19 +391,27 @@ export function detectCurrentAlgorithmBoxes(imageData) {
   }
 
   windows.sort((a, b) => b.norm - a.norm);
-  const selected = windows.slice(0, Math.min(TOP_N, windows.length)).map(w => [w.x1, w.x2]);
-  const grouped = groupIntervals(selected, Math.round(step * GROUP_GAP_FACTOR));
+  const selectedWindows = windows.slice(0, Math.min(TOP_N, windows.length));
+  const selectedIntervals = selectedWindows.map(w => [w.x1, w.x2]);
+  const grouped = groupIntervals(selectedIntervals, Math.round(step * GROUP_GAP_FACTOR));
 
   const invScaleX = originalW / width;
   const invScaleY = originalH / height;
   return {
-    boxes: grouped.map(([x1, x2]) => ({
-      source: "current",
-      xMin: Math.max(0, Math.round(x1 * invScaleX)),
-      xMax: Math.min(originalW - 1, Math.round(x2 * invScaleX)),
-      yMin: Math.max(0, Math.round(lup * invScaleY)),
-      yMax: Math.min(originalH - 1, Math.round((ldw - 1) * invScaleY))
-    })),
+    boxes: grouped.map(([x1, x2]) => {
+      const groupScore = selectedWindows
+        .filter(w => w.x2 >= x1 && w.x1 <= x2)
+        .reduce((maximum, w) => Math.max(maximum, w.norm), 0);
+
+      return {
+        source: "current",
+        suspicionPercent: Math.max(0, Math.min(100, Math.round(groupScore * 100))),
+        xMin: Math.max(0, Math.round(x1 * invScaleX)),
+        xMax: Math.min(originalW - 1, Math.round(x2 * invScaleX)),
+        yMin: Math.max(0, Math.round(lup * invScaleY)),
+        yMax: Math.min(originalH - 1, Math.round((ldw - 1) * invScaleY))
+      };
+    }),
     threshold,
     lup: Math.round(lup * invScaleY),
     ldw: Math.round(ldw * invScaleY),

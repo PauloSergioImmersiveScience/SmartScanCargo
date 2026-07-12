@@ -198,7 +198,7 @@ function applyMorphology(binary, cols, rows) {
   return out;
 }
 
-function componentsToBoxes(binary, cols, rows, centersX, centersY, step, originalW, originalH, analysisW, analysisH) {
+function componentsToBoxes(binary, scoreMap, cols, rows, centersX, centersY, step, originalW, originalH, analysisW, analysisH) {
   const visited = new Uint8Array(binary.length);
   const boxes = [];
   const minAreaPixels = Math.ceil((BB_AREA_MIN_PERCENT / 100) * originalW * originalH);
@@ -210,10 +210,12 @@ function componentsToBoxes(binary, cols, rows, centersX, centersY, step, origina
     if (!binary[start] || visited[start]) continue;
     const queue = new Int32Array(binary.length);
     let head = 0, tail = 0, count = 0;
+    let componentMaxScore = 0;
     let minGX = cols, maxGX = 0, minGY = rows, maxGY = 0;
     queue[tail++] = start; visited[start] = 1;
     while (head < tail) {
       const idx = queue[head++]; count++;
+      componentMaxScore = Math.max(componentMaxScore, scoreMap[idx] || 0);
       const gy = Math.floor(idx / cols), gx = idx % cols;
       minGX = Math.min(minGX, gx); maxGX = Math.max(maxGX, gx);
       minGY = Math.min(minGY, gy); maxGY = Math.max(maxGY, gy);
@@ -239,6 +241,7 @@ function componentsToBoxes(binary, cols, rows, centersX, centersY, step, origina
       yMin: Math.max(0, Math.round(ay0 * scaleY) - BBOX_MARGIN),
       yMax: Math.min(originalH - 1, Math.round(ay1 * scaleY) + BBOX_MARGIN),
       source: "fft",
+      suspicionPercent: Math.max(0, Math.min(100, Math.round(componentMaxScore * 100))),
       thickness: BBOX_THICKNESS
     });
   }
@@ -292,14 +295,16 @@ export async function detectFftBoxes(imageData, regionR) {
     maxZ = Math.max(maxZ, z[i]);
   }
 
+  const scoreMap = new Float32Array(energy.length);
   let suspicious = new Uint8Array(energy.length);
   for (let i = 0; i < energy.length; i++) {
     const score = maxZ > EPS ? z[i] / maxZ : 0;
+    scoreMap[i] = score;
     const detector = energy[i] > FFT_ENERGY_ABS_MIN && z[i] > FFT_Z_THRESHOLD;
     suspicious[i] = score > FFT_SCORE_THRESHOLD && (!REQUIRE_FFT_DETECTOR || detector) ? 1 : 0;
   }
   if (APPLY_MORPHOLOGY) suspicious = applyMorphology(suspicious, cols, rows);
-  return componentsToBoxes(suspicious, cols, rows, centersX, centersY, step, originalW, originalH, analysisW, analysisH);
+  return componentsToBoxes(suspicious, scoreMap, cols, rows, centersX, centersY, step, originalW, originalH, analysisW, analysisH);
 }
 
 export async function findFftSuspectRegions(regionR) {
