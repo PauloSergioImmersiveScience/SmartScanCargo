@@ -110,7 +110,7 @@ select:focus {
 
 .image-source-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  grid-template-columns: minmax(260px, 1fr);
   gap: 16px;
 }
 
