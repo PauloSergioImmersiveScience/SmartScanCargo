@@ -10,7 +10,7 @@ import {
   btnSuspect,
   hemdMissingModal,
   btnCloseHemdModal
-} from "./dom.js";
+} from "./dom.js?v=12";
 import { state } from "./state.js";
 import { resetSelection, setStatus } from "./ui.js";
 
@@ -89,7 +89,7 @@ export function showImageView(view) {
 
   if (view === "hemd" && !state.hemdImageData) {
     openMissingHemdModal();
-    setStatus("Não foi possível encontrar a imagem HEMD correspondente! Ambas devem estar no mesmo diretório!");
+    setStatus("Não foi possível encontrar a imagem HEMD correspondente!");
     updateViewButtons();
     return;
   }
