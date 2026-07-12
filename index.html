@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmartScanCargo - Equalização Local</title>
-  <link rel="stylesheet" href="style.css?v=20260712-7" />
+  <link rel="stylesheet" href="style.css?v=20260712-20" />
 </head>
 <body>
   <section id="loginScreen" class="login-screen">
@@ -31,10 +31,11 @@
       <button id="btnLogout" class="btn ghost">Sair</button>
     </header>
 
-    <section class="toolbar">
-      <div class="upload-row local-upload-row">
+
+    <section class="toolbar four-upload-toolbar">
+      <div class="upload-row local-xray-row">
         <label class="upload-action local-upload-action" for="imageLoader">
-          Carregar imagem do seu dispositivo
+          Carregar imagem de Raio-X de seu dispositivo
         </label>
         <input
           id="imageLoader"
@@ -42,18 +43,42 @@
           type="file"
           accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff"
         />
-        <input id="hemdLoader" class="visually-hidden-file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" />
         <label class="selection-display" for="imageLoader">
-          <span id="localFileDisplay">Selecione uma imagem X-RAY</span>
+          <span id="localXrayDisplay">Selecione uma imagem X-RAY</span>
           <span class="selection-arrow" aria-hidden="true">⌄</span>
         </label>
       </div>
 
-      <div class="upload-row example-upload-row">
-        <button id="btnLoadExample" class="upload-action example-upload-action" type="button">
-          Carregar imagem exemplo
+      <div class="upload-row local-hemd-row">
+        <label class="upload-action local-upload-action" for="hemdLoader">
+          Carregar imagem HEMD correspondente
+        </label>
+        <input
+          id="hemdLoader"
+          class="visually-hidden-file"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff"
+        />
+        <label class="selection-display" for="hemdLoader">
+          <span id="localHemdDisplay">Selecione uma imagem HEMD</span>
+          <span class="selection-arrow" aria-hidden="true">⌄</span>
+        </label>
+      </div>
+
+      <div class="upload-row github-xray-row">
+        <button id="btnLoadExampleXray" class="upload-action example-upload-action" type="button">
+          Carregar imagem de Raio-X exemplo
         </button>
-        <select id="exampleImageSelect" aria-label="Selecione uma imagem exemplo">
+        <select id="exampleXraySelect" aria-label="Selecione uma imagem X-RAY exemplo">
+          <option value="">Selecione uma imagem</option>
+        </select>
+      </div>
+
+      <div class="upload-row github-hemd-row">
+        <button id="btnLoadExampleHemd" class="upload-action example-upload-action" type="button">
+          Carregar imagem HEMD correspondente
+        </button>
+        <select id="exampleHemdSelect" aria-label="Selecione uma imagem HEMD exemplo">
           <option value="">Selecione uma imagem</option>
         </select>
       </div>
@@ -89,8 +114,8 @@
     <section class="help-card">
       <h2>Controles</h2>
       <ul>
-        <li><strong>Escolher imagem no seu dispositivo:</strong> abre uma imagem X-RAY do dispositivo e solicita somente a HEMD correspondente.</li>
-        <li><strong>Imagem exemplo do GitHub:</strong> carrega automaticamente o par <code>xray{i}.png</code> e <code>hemd{i}.png</code>.</li>
+        <li><strong>Imagens locais:</strong> carregue separadamente a X-RAY e a HEMD correspondente.</li>
+        <li><strong>Imagens exemplo do GitHub:</strong> carregue separadamente a X-RAY e a HEMD correspondente da pasta ImagensTest.</li>
         <li><strong>Clique esquerdo 1:</strong> define o ponto p1.</li>
         <li><strong>Clique esquerdo 2:</strong> define o ponto p2 e equaliza o bounding box.</li>
         <li><strong>Clique direito:</strong> restaura a imagem original.</li>
@@ -114,22 +139,14 @@
     hidden
   >
     <div class="app-modal__backdrop" data-close-hemd-modal></div>
-
     <div class="app-modal__window" role="document">
       <div class="app-modal__icon" aria-hidden="true">!</div>
-
-      <h2 id="hemdMissingModalTitle">Imagem HEMD não encontrada</h2>
-
-      <p>
-        Não foi possível encontrar a imagem HEMD correspondente! Ambas devem estar no mesmo diretório!
-      </p>
-
-      <button id="btnCloseHemdModal" class="btn primary" type="button">
-        OK
-      </button>
+      <h2 id="hemdMissingModalTitle">Imagem HEMD não carregada</h2>
+      <p>Nenhuma imagem hemd foi carregada!</p>
+      <button id="btnCloseHemdModal" class="btn primary" type="button">OK</button>
     </div>
   </div>
 
-  <script type="module" src="script.js?v=11"></script>
+  <script type="module" src="script.js?v=20"></script>
 </body>
 </html>

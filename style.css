@@ -99,10 +99,12 @@ select:focus {
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(670px, 1fr) auto;
+  grid-template-columns: minmax(760px, 1fr) auto;
   grid-template-areas:
-    "local buttons"
-    "example buttons";
+    "local-xray buttons"
+    "local-hemd buttons"
+    "github-xray buttons"
+    "github-hemd buttons";
   gap: 5px 10px;
   align-items: center;
   margin-top: 8px;
@@ -116,13 +118,10 @@ select:focus {
   min-width: 0;
 }
 
-.local-upload-row {
-  grid-area: local;
-}
-
-.example-upload-row {
-  grid-area: example;
-}
+.local-xray-row { grid-area: local-xray; }
+.local-hemd-row { grid-area: local-hemd; }
+.github-xray-row { grid-area: github-xray; }
+.github-hemd-row { grid-area: github-hemd; }
 
 .upload-action {
   display: flex;
@@ -166,8 +165,8 @@ select:focus {
 }
 
 .selection-display,
-.local-upload-row select,
-.example-upload-row select {
+.github-xray-row select,
+.github-hemd-row select {
   width: 100%;
   min-width: 0;
   min-height: 30px;
@@ -198,14 +197,14 @@ select:focus {
 }
 
 .selection-display:hover,
-.local-upload-row select:hover,
-.example-upload-row select:hover {
+.github-xray-row select:hover,
+.github-hemd-row select:hover {
   border-color: #9eabba;
 }
 
 .selection-display:focus-within,
-.local-upload-row select:focus,
-.example-upload-row select:focus {
+.github-xray-row select:focus,
+.github-hemd-row select:focus {
   outline: none;
   border-color: #1f6feb;
   box-shadow: 0 0 0 2px rgba(31, 111, 235, 0.14);
@@ -352,8 +351,10 @@ canvas {
   .toolbar {
     grid-template-columns: 1fr;
     grid-template-areas:
-      "local"
-      "example"
+      "local-xray"
+      "local-hemd"
+      "github-xray"
+      "github-hemd"
       "buttons";
   }
 
@@ -511,8 +512,114 @@ canvas {
   }
 }
 
-.local-upload-row select:disabled {
-  cursor: not-allowed;
-  color: #64748b;
-  background: #f8fafc;
+/* ==========================================================
+   Janela modal do SmartScanCargo
+   ========================================================== */
+.app-modal[hidden] {
+  display: none;
+}
+
+.app-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.app-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.62);
+  backdrop-filter: blur(2px);
+}
+
+.app-modal__window {
+  position: relative;
+  z-index: 1;
+  width: min(430px, calc(100vw - 32px));
+  padding: 28px 28px 24px;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.38);
+  text-align: center;
+  animation: smartscan-modal-in 160ms ease-out;
+}
+
+.app-modal__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: #f4c430;
+  color: #1f2937;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.app-modal__window h2 {
+  margin: 0 0 10px;
+  color: #172033;
+  font-size: 21px;
+}
+
+.app-modal__window p {
+  margin: 0 0 22px;
+  color: #475569;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.app-modal__window .btn {
+  min-width: 100px;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+@keyframes smartscan-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* Quatro linhas independentes de carregamento */
+.four-upload-toolbar .buttons {
+  grid-area: buttons;
+  align-self: center;
+}
+
+.local-upload-action {
+  background: #f4c430 !important;
+  color: #1f2937 !important;
+}
+
+.local-upload-action:hover {
+  background: #d8aa12 !important;
+}
+
+.example-upload-action {
+  background: #7b8ce4;
+  color: #ffffff;
+}
+
+.example-upload-action:hover {
+  background: #6679da;
+}
+
+.app-modal__window {
+  width: min(390px, calc(100vw - 32px));
 }

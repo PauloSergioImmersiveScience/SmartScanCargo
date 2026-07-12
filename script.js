@@ -4,10 +4,13 @@ import {
   btnLogin,
   btnLogout,
   imageLoader,
-  localFileDisplay,
   hemdLoader,
-  exampleImageSelect,
-  btnLoadExample,
+  localXrayDisplay,
+  localHemdDisplay,
+  exampleXraySelect,
+  exampleHemdSelect,
+  btnLoadExampleXray,
+  btnLoadExampleHemd,
   imageCanvas,
   pointsCountText,
   btnRestore,
@@ -15,20 +18,20 @@ import {
   btnSuspect,
   btnShowHemd,
   btnShowXray
-} from "./scripts/dom.js?v=12";
+} from "./scripts/dom.js?v=20";
 
 import { state } from "./scripts/state.js";
 import { setStatus, resetSelection } from "./scripts/ui.js";
 import {
   getCanvasPoint,
-  loadImagePairFromSources,
   loadXrayOnlyFromSource,
+  loadHemdOnlyFromSource,
   redrawCanvas,
   restoreOriginalImage,
   downloadEqualizedImage,
   showImageView,
   updateViewButtons
-} from "./scripts/imagem.js?v=12";
+} from "./scripts/imagem.js?v=20";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
 import { findPossibleSuspectRegions } from "./scripts/detector.js?v=6";
 import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=2";
@@ -46,123 +49,131 @@ function extractIndex(fileName, prefix) {
   return match ? match[1] : null;
 }
 
-let pendingXrayFile = null;
-let expectedLocalHemdName = "";
-
-function setLocalDisplay(text) {
-  localFileDisplay.textContent = text;
+function expectedHemdIndex() {
+  return extractIndex(state.currentFileName || "", "xray");
 }
 
-
-function resetExampleSelection() {
-  exampleImageSelect.value = "";
-  btnLoadExample.disabled = true;
+function setLocalDisplay(element, text) {
+  element.textContent = text;
 }
 
-EXAMPLE_IMAGES.forEach((example) => {
-  const option = document.createElement("option");
-  option.value = String(example.index);
-  option.textContent = example.label;
-  exampleImageSelect.appendChild(option);
-});
-
-exampleImageSelect.addEventListener("change", () => {
-  btnLoadExample.disabled = !exampleImageSelect.value;
-});
-
-btnLoadExample.addEventListener("click", async () => {
-  const example = EXAMPLE_IMAGES.find(
-    (item) => String(item.index) === exampleImageSelect.value
-  );
-
-  if (!example) {
-    setStatus("Selecione uma imagem exemplo antes de carregar.");
-    return;
-  }
-
-  imageLoader.value = "";
-  hemdLoader.value = "";
-  pendingXrayFile = null;
-  expectedLocalHemdName = "";
-  setLocalDisplay("Selecione uma imagem X-RAY");
-
-  const xrayURL = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(example.xray)}`;
-  const hemdURL = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(example.hemd)}`;
-  await loadImagePairFromSources(xrayURL, hemdURL, example.xray, example.hemd);
-});
-btnLoadExample.disabled = true;
-
-
-async function loadLocalPair(xrayFile, hemdFile) {
-  const xrayURL = URL.createObjectURL(xrayFile);
-  const hemdURL = URL.createObjectURL(hemdFile);
-  try {
-    await loadImagePairFromSources(xrayURL, hemdURL, xrayFile.name, hemdFile.name);
-  } finally {
-    URL.revokeObjectURL(xrayURL);
-    URL.revokeObjectURL(hemdURL);
-  }
+function populateExampleSelect(select, type) {
+  EXAMPLE_IMAGES.forEach((example) => {
+    const option = document.createElement("option");
+    option.value = String(example.index);
+    option.textContent = type === "xray"
+      ? `Raio-X ${example.index}`
+      : `HEMD ${example.index}`;
+    select.appendChild(option);
+  });
 }
+
+populateExampleSelect(exampleXraySelect, "xray");
+populateExampleSelect(exampleHemdSelect, "hemd");
+
+btnLoadExampleXray.disabled = true;
+btnLoadExampleHemd.disabled = true;
+
+exampleXraySelect.addEventListener("change", () => {
+  btnLoadExampleXray.disabled = !exampleXraySelect.value;
+});
+
+exampleHemdSelect.addEventListener("change", () => {
+  btnLoadExampleHemd.disabled = !exampleHemdSelect.value;
+});
 
 imageLoader.addEventListener("change", async (event) => {
-  const xrayFile = event.target.files?.[0];
+  const file = event.target.files?.[0];
+  if (!file) return;
 
-  if (!xrayFile) {
-    setLocalDisplay("Selecione uma imagem X-RAY");
-    return;
-  }
-
-  const index = extractIndex(xrayFile.name, "xray");
-
+  const index = extractIndex(file.name, "xray");
   if (!index) {
     setStatus('Selecione uma imagem com o padrão "xray{i}.png".');
     imageLoader.value = "";
-    setLocalDisplay("Selecione uma imagem X-RAY");
     return;
   }
 
-  pendingXrayFile = xrayFile;
-  expectedLocalHemdName = `hemd${index}.png`;
+  setLocalDisplay(localXrayDisplay, file.name);
+  const url = URL.createObjectURL(file);
 
-  setLocalDisplay(xrayFile.name);
-  resetExampleSelection();
-
-  // A X-RAY é carregada imediatamente e permanece processável,
-  // mesmo que a HEMD não seja escolhida ou encontrada.
-  const xrayURL = URL.createObjectURL(xrayFile);
   try {
-    await loadXrayOnlyFromSource(xrayURL, xrayFile.name);
+    await loadXrayOnlyFromSource(url, file.name);
+    hemdLoader.value = "";
+    setLocalDisplay(localHemdDisplay, "Selecione uma imagem HEMD");
   } finally {
-    URL.revokeObjectURL(xrayURL);
+    URL.revokeObjectURL(url);
   }
-
-  setStatus(
-    `Imagem ${xrayFile.name} carregada. Agora selecione somente ${expectedLocalHemdName}.`
-  );
-
-  hemdLoader.value = "";
-  hemdLoader.click();
 });
 
 hemdLoader.addEventListener("change", async (event) => {
-  const hemdFile = event.target.files?.[0];
+  const file = event.target.files?.[0];
+  if (!file) return;
 
-  if (!hemdFile || !pendingXrayFile) {
-    return;
-  }
-
-  if (hemdFile.name.toLowerCase() !== expectedLocalHemdName.toLowerCase()) {
-    setStatus(
-      `A imagem selecionada não corresponde à X-RAY. Era esperada: ${expectedLocalHemdName}.`
-    );
+  if (!state.currentImageData) {
+    setStatus("Carregue primeiro uma imagem X-RAY.");
     hemdLoader.value = "";
     return;
   }
 
-  await loadLocalPair(pendingXrayFile, hemdFile);
-  setStatus(
-    `Par carregado: ${pendingXrayFile.name} e ${hemdFile.name}.`
+  const hemdIndex = extractIndex(file.name, "hemd");
+  const xrayIndex = expectedHemdIndex();
+
+  if (!hemdIndex || hemdIndex !== xrayIndex) {
+    setStatus(`Selecione a imagem HEMD correspondente: hemd${xrayIndex}.png.`);
+    hemdLoader.value = "";
+    return;
+  }
+
+  setLocalDisplay(localHemdDisplay, file.name);
+  const url = URL.createObjectURL(file);
+
+  try {
+    await loadHemdOnlyFromSource(url, file.name);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+});
+
+btnLoadExampleXray.addEventListener("click", async () => {
+  const example = EXAMPLE_IMAGES.find(
+    (item) => String(item.index) === exampleXraySelect.value
   );
+
+  if (!example) {
+    setStatus("Selecione uma imagem X-RAY exemplo.");
+    return;
+  }
+
+  const url = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(example.xray)}`;
+  await loadXrayOnlyFromSource(url, example.xray);
+
+  exampleHemdSelect.value = "";
+  btnLoadExampleHemd.disabled = true;
+});
+
+btnLoadExampleHemd.addEventListener("click", async () => {
+  if (!state.currentImageData) {
+    setStatus("Carregue primeiro uma imagem X-RAY.");
+    return;
+  }
+
+  const example = EXAMPLE_IMAGES.find(
+    (item) => String(item.index) === exampleHemdSelect.value
+  );
+
+  if (!example) {
+    setStatus("Selecione uma imagem HEMD exemplo.");
+    return;
+  }
+
+  const xrayIndex = expectedHemdIndex();
+  if (String(example.index) !== String(xrayIndex)) {
+    setStatus(`Selecione a HEMD ${xrayIndex}, correspondente à X-RAY carregada.`);
+    return;
+  }
+
+  const url = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(example.hemd)}`;
+  await loadHemdOnlyFromSource(url, example.hemd);
 });
 
 btnShowHemd.addEventListener("click", () => showImageView("hemd"));
@@ -201,6 +212,7 @@ btnRestore.addEventListener("click", restoreOriginalImage);
 
 btnSuspect.addEventListener("click", async () => {
   if (state.activeView !== "xray") return;
+
   btnSuspect.disabled = true;
   const originalText = btnSuspect.textContent;
   btnSuspect.textContent = "Analisando...";
@@ -208,10 +220,12 @@ btnSuspect.addEventListener("click", async () => {
   try {
     const currentResult = await findPossibleSuspectRegions();
     if (!currentResult) return;
+
     const fftBoxes = await findFftSuspectRegions({
       yMin: currentResult.lup,
       yMax: currentResult.ldw - 1
     });
+
     setStatus(
       `${currentResult.boxes.length} BB(s) do algoritmo atual e ` +
       `${fftBoxes.length} BB(s) do algoritmo FFT foram sobrepostos dentro da região R.`
@@ -226,13 +240,18 @@ btnSuspect.addEventListener("click", async () => {
 });
 
 btnDownload.addEventListener("click", downloadEqualizedImage);
+
 window.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !appScreen.classList.contains("hidden")) {
+  if (
+    event.key === "Escape" &&
+    !appScreen.classList.contains("hidden") &&
+    document.getElementById("hemdMissingModal")?.hidden
+  ) {
     downloadEqualizedImage();
   }
 });
+
 window.addEventListener("resize", redrawCanvas);
 
-setLocalDisplay("Selecione uma imagem X-RAY");
 updateViewButtons();
 restoreLoginState();
