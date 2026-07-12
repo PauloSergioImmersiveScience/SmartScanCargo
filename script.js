@@ -18,7 +18,8 @@ import {
   imageCanvas,     // Canvas no qual a imagem é exibida e manipulada.
   pointsCountText, // Elemento que mostra quantos pontos foram selecionados.
   btnRestore,      // Botão que restaura a imagem original.
-  btnDownload      // Botão que baixa a imagem equalizada.
+  btnDownload,     // Botão que baixa a imagem equalizada.
+  btnSuspect       // Botão que procura possíveis regiões suspeitas.
 } from "./scripts/dom.js";
 
 // Importa o objeto que armazena o estado atual da aplicação.
@@ -41,6 +42,9 @@ import {
 
 // Importa a função que aplica a equalização local no bounding box.
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
+
+// Importa a detecção automática de possíveis regiões suspeitas.
+import { findPossibleSuspectRegions } from "./scripts/detector.js";
 
 // Importa as funções responsáveis pelo controle de acesso.
 import {
@@ -164,6 +168,20 @@ imageCanvas.addEventListener("contextmenu", (event) => {
 
 // Restaura a imagem original ao clicar no botão correspondente.
 btnRestore.addEventListener("click", restoreOriginalImage);
+
+// Executa a segmentação automática e mostra os bounding boxes sugeridos.
+btnSuspect.addEventListener("click", async () => {
+  btnSuspect.disabled = true;
+  const originalText = btnSuspect.textContent;
+  btnSuspect.textContent = "Analisando...";
+
+  try {
+    await findPossibleSuspectRegions();
+  } finally {
+    btnSuspect.disabled = false;
+    btnSuspect.textContent = originalText;
+  }
+});
 
 // Baixa a imagem equalizada ao clicar no botão correspondente.
 btnDownload.addEventListener("click", downloadEqualizedImage);

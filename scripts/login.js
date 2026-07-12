@@ -12,7 +12,7 @@ export function unlockApp() {
   loginScreen.classList.add("hidden");
   appScreen.classList.remove("hidden");
 
-  setStatus("Clique em 'Carregar imagem' para escolher uma imagem local.");
+  setStatus("Clique em 'Carregar imagem' para escolher uma imagem do computador.");
 }
 
 export function lockApp() {

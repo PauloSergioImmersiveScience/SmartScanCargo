@@ -4,5 +4,6 @@ export const state = {
   selectedPoints: [],
   previewPoint: null,
   lastBox: null,
+  suspectBoxes: [],
   currentFileName: ""
 };

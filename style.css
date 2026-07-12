@@ -234,3 +234,24 @@ canvas {
     flex-direction: column;
   }
 }
+
+.suspect-action {
+  display: flex;
+  justify-content: center;
+  margin: 14px 0 4px;
+}
+
+.danger {
+  min-width: 330px;
+  padding: 14px 28px;
+  border-radius: 12px;
+  background: #f21d1d;
+  color: #000000;
+  font-size: 21px;
+  box-shadow: 0 4px 10px rgba(242, 29, 29, 0.24);
+}
+
+.danger:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}

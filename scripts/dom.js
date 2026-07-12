@@ -15,3 +15,4 @@ export const bboxInfoText = document.getElementById("bboxInfo");
 export const statusText = document.getElementById("statusText");
 export const btnRestore = document.getElementById("btnRestore");
 export const btnDownload = document.getElementById("btnDownload");
+export const btnSuspect = document.getElementById("btnSuspect");

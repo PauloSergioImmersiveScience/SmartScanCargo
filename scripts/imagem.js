@@ -35,9 +35,26 @@ export function redrawCanvas() {
 
   ctx.putImageData(state.currentImageData, 0, 0);
 
+  // Bounding boxes sugeridos pelo algoritmo de detecção.
+  if (state.suspectBoxes && state.suspectBoxes.length > 0) {
+    ctx.save();
+    ctx.strokeStyle = "#ff1f1f";
+    ctx.fillStyle = "#ff1f1f";
+    ctx.lineWidth = Math.max(3, Math.round(imageCanvas.width / 500));
+    ctx.font = `${Math.max(14, Math.round(imageCanvas.width / 90))}px Arial`;
+
+    state.suspectBoxes.forEach((box, index) => {
+      const width = box.xMax - box.xMin + 1;
+      const height = box.yMax - box.yMin + 1;
+      ctx.strokeRect(box.xMin, box.yMin, width, height);
+      ctx.fillText(`BB ${index + 1}`, box.xMin + 6, Math.max(18, box.yMin - 8));
+    });
+    ctx.restore();
+  }
+
   if (state.lastBox) {
     ctx.save();
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = "#00e5ff";
     ctx.lineWidth = Math.max(2, Math.round(imageCanvas.width / 700));
     ctx.strokeRect(
       state.lastBox.xMin,
@@ -91,6 +108,7 @@ export function loadImageFromSource(src, fileName) {
 
     state.currentFileName = fileName;
     state.lastBox = null;
+    state.suspectBoxes = [];
 
     imageNameText.textContent = fileName;
     bboxInfoText.textContent = "nenhum";
@@ -121,6 +139,7 @@ export function restoreOriginalImage() {
   );
 
   state.lastBox = null;
+  state.suspectBoxes = [];
   bboxInfoText.textContent = "nenhum";
 
   resetSelection();
