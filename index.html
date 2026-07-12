@@ -32,20 +32,18 @@
     </header>
 
     <section class="toolbar">
-      <div class="image-source-grid">
-        <div class="field-group">
-          <label for="imageLoader">Escolher arquivo do dispositivo</label>
-          <input id="imageLoader" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" />
-        </div>
+      <div class="field-group local-image-group">
+        <label for="imageLoader">Carregar imagem do seu dispositivo</label>
+        <input id="imageLoader" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" />
+      </div>
 
-        <div class="field-group example-group">
-          <label for="exampleImageSelect">Carregar Imagem Exemplo</label>
-          <div class="example-selector">
-            <select id="exampleImageSelect">
-              <option value="">Selecione uma imagem exemplo</option>
-            </select>
-            <button id="btnLoadExample" class="btn example" type="button">Carregar exemplo</button>
-          </div>
+      <div class="field-group example-group">
+        <label for="exampleImageSelect">Carregar imagem exemplo</label>
+        <div class="example-selector">
+          <select id="exampleImageSelect">
+            <option value="">Selecione uma imagem</option>
+          </select>
+          <button id="btnLoadExample" class="btn example" type="button">Carregar exemplo</button>
         </div>
       </div>
 
@@ -74,7 +72,7 @@
     <section class="help-card">
       <h2>Controles</h2>
       <ul>
-        <li><strong>Escolher arquivo do dispositivo:</strong> abre uma imagem armazenada no computador, celular ou tablet.</li>
+        <li><strong>Escolher imagem no seu dispositivo:</strong> abre uma imagem armazenada no computador, celular ou tablet.</li>
         <li><strong>Imagem exemplo do GitHub:</strong> carrega uma das imagens disponíveis na pasta <code>ImagensTest</code> do projeto.</li>
         <li><strong>Clique esquerdo 1:</strong> define o ponto p1.</li>
         <li><strong>Clique esquerdo 2:</strong> define o ponto p2 e equaliza o bounding box.</li>
