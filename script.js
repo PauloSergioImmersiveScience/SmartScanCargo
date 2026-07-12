@@ -45,6 +45,16 @@ function extractIndex(fileName, prefix) {
   return match ? match[1] : null;
 }
 
+function getSelectedDirectory(file) {
+  const relativePath = file.webkitRelativePath || "";
+  const separatorIndex = relativePath.lastIndexOf("/");
+  return separatorIndex >= 0 ? relativePath.slice(0, separatorIndex) : "";
+}
+
+function filesAreInSameDirectory(fileA, fileB) {
+  return getSelectedDirectory(fileA) === getSelectedDirectory(fileB);
+}
+
 function setLocalDisplay(text) {
   const display = document.getElementById("localFileDisplay");
   if (display) display.textContent = text;
@@ -115,7 +125,9 @@ imageLoader.addEventListener("change", async (event) => {
   const index = extractIndex(xrayFile.name, "xray");
   const expectedHemdName = `hemd${index}.png`;
   const hemdFile = files.find(
-    (file) => file.name.toLowerCase() === expectedHemdName.toLowerCase()
+    (file) =>
+      file.name.toLowerCase() === expectedHemdName.toLowerCase() &&
+      filesAreInSameDirectory(xrayFile, file)
   );
 
   setLocalDisplay(xrayFile.name);
@@ -126,13 +138,11 @@ imageLoader.addEventListener("change", async (event) => {
     return;
   }
 
-  // Tenta usar automaticamente o HEMD publicado na pasta ImagensTest.
-  // Se ele não existir, a X-RAY é carregada normalmente e continua processável.
-  const publishedHemdURL = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(expectedHemdName)}`;
+  // Para arquivos locais, a HEMD correspondente só é aceita quando foi
+  // selecionada no mesmo diretório da X-RAY. O navegador não pode acessar
+  // silenciosamente outros arquivos da pasta sem que o usuário os selecione.
   const xrayURL = URL.createObjectURL(xrayFile);
   try {
-    await loadImagePairFromSources(xrayURL, publishedHemdURL, xrayFile.name, expectedHemdName);
-  } catch {
     await loadXrayOnlyFromSource(xrayURL, xrayFile.name);
   } finally {
     URL.revokeObjectURL(xrayURL);
