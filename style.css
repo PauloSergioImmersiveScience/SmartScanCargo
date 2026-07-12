@@ -110,7 +110,7 @@ select:focus {
 
 .upload-row {
   display: grid;
-  grid-template-columns: 180px minmax(280px, 1fr);
+  grid-template-columns: 220px minmax(280px, 1fr);
   gap: 6px;
   align-items: center;
   min-width: 0;
@@ -127,7 +127,7 @@ select:focus {
 .upload-action {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   width: 100%;
   min-height: 30px;
   margin: 0;
