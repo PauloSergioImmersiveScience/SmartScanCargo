@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmartScanCargo - Equalização Local</title>
-  <link rel="stylesheet" href="style.css?v=20260712-41" />
+  <link rel="stylesheet" href="style.css?v=20260712-42" />
 </head>
 <body>
   <section id="loginScreen" class="login-screen">
@@ -200,6 +200,13 @@
 <label class="config-check"><input name="fft.REQUIRE_FFT_DETECTOR" type="checkbox" /><span>REQUIRE_FFT_DETECTOR</span></label></div>
         </fieldset>
 
+        <footer class="config-actions">
+          <button id="btnConfigDefaults" class="btn secondary" type="button">Restaurar padrões</button>
+          <button id="btnConfigCancel" class="btn ghost" type="button">Cancelar</button>
+          <button id="btnConfigApply" class="btn primary" type="button">Aplicar</button>
+          <button id="btnConfigSave" class="btn success" type="button">Salvar configuração</button>
+        </footer>
+
         <section class="config-glossary" aria-labelledby="configGlossaryTitle">
           <h3 id="configGlossaryTitle">Glossário dos parâmetros</h3>
           <p class="config-glossary-intro">
@@ -333,12 +340,6 @@
           </dl>
         </section>
         <p id="configValidation" class="config-validation" role="alert"></p>
-        <footer class="config-actions">
-          <button id="btnConfigDefaults" class="btn secondary" type="button">Restaurar padrões</button>
-          <button id="btnConfigCancel" class="btn ghost" type="button">Cancelar</button>
-          <button id="btnConfigApply" class="btn primary" type="button">Aplicar</button>
-          <button id="btnConfigSave" class="btn success" type="button">Salvar configuração</button>
-        </footer>
       </form>
     </div>
   </div>

@@ -811,3 +811,19 @@ body.modal-open {
     gap: 4px;
   }
 }
+
+/* Organização final dos botões da configuração */
+.config-actions {
+  margin: 8px 0 22px;
+  align-items: center;
+}
+
+#btnConfigApply {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 92px;
+  max-width: 120px;
+  margin-left: 16px;
+  padding-left: 18px;
+  padding-right: 18px;
+}
