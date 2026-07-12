@@ -45,16 +45,28 @@ export function getCanvasPoint(event) {
 }
 
 export function updateViewButtons() {
-  const hasPair = Boolean(state.currentImageData && state.hemdImageData);
+  const hasXray = Boolean(state.currentImageData);
+  const hasHemd = Boolean(state.hemdImageData);
   const showingXray = state.activeView === "xray";
 
-  btnShowHemd.disabled = !hasPair || !showingXray;
-  btnShowXray.disabled = !hasPair || showingXray;
-  btnSuspect.disabled = !state.currentImageData || !showingXray;
+  // O botão HEMD continua disponível quando há uma X-RAY carregada,
+  // mesmo que a imagem HEMD correspondente não exista. Nesse caso,
+  // o clique apenas informa ao usuário que ela não foi encontrada.
+  btnShowHemd.disabled = !hasXray || !showingXray;
+  btnShowXray.disabled = !hasXray || showingXray || !hasHemd;
+  btnSuspect.disabled = !hasXray || !showingXray;
 }
 
 export function showImageView(view) {
-  if (!state.currentImageData || !state.hemdImageData) return;
+  if (!state.currentImageData) return;
+
+  if (view === "hemd" && !state.hemdImageData) {
+    const message = "Não encontrei a correspondente HEMD";
+    setStatus(message);
+    window.alert(message);
+    updateViewButtons();
+    return;
+  }
 
   state.activeView = view === "hemd" ? "hemd" : "xray";
   const showingXray = state.activeView === "xray";
@@ -116,6 +128,44 @@ export function redrawCanvas() {
     ctx.fill();
     ctx.stroke();
     ctx.restore();
+  }
+}
+
+export async function loadXrayOnlyFromSource(xraySrc, xrayFileName) {
+  try {
+    const xrayImg = await loadHtmlImage(xraySrc);
+    const width = xrayImg.naturalWidth;
+    const height = xrayImg.naturalHeight;
+
+    imageCanvas.width = width;
+    imageCanvas.height = height;
+    hemdCanvas.width = width;
+    hemdCanvas.height = height;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(xrayImg, 0, 0, width, height);
+    hemdCtx.clearRect(0, 0, width, height);
+
+    state.originalImageData = ctx.getImageData(0, 0, width, height);
+    state.currentImageData = cloneImageData(state.originalImageData);
+    state.hemdImageData = null;
+    state.currentFileName = xrayFileName;
+    state.hemdFileName = "";
+    state.activeView = "xray";
+    state.lastBox = null;
+    state.currentDetectorBoxes = [];
+    state.fftDetectorBoxes = [];
+    state.suspectBoxes = [];
+
+    bboxInfoText.textContent = "nenhum";
+    resetSelection();
+    redrawCanvas();
+    showImageView("xray");
+    setStatus(`Imagem X-RAY carregada: ${xrayFileName} (${width} x ${height}).`);
+  } catch (error) {
+    console.error(error);
+    setStatus(`Não foi possível carregar a imagem X-RAY: ${error.message}`);
+    throw error;
   }
 }
 
