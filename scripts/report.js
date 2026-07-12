@@ -24,18 +24,16 @@ function fitInside(sourceWidth, sourceHeight, maxWidth, maxHeight) {
 }
 
 function boxLabel(box, index) {
-  const source = box.source === "fft"
-    ? "Detecção FFT de altas frequências"
-    : "Detecção de região grande despadronizada";
+  const prefix = box.source === "fft" ? "FFT" : "BB";
+  const displayedName = `${prefix} ${index + 1}`;
   const percentage = Number.isFinite(box.suspicionPercent)
     ? box.suspicionPercent
     : 0;
 
   return {
-    title: `Região ${index + 1} — ${source}`,
+    title: displayedName,
     percentage,
-    coordinates: `BB: x=${box.xMin}, y=${box.yMin}, largura=${box.xMax - box.xMin + 1}, altura=${box.yMax - box.yMin + 1}`,
-    comment: `Percentual de suspeita: ${percentage}%. Este percentual é calculado a partir do score normalizado produzido pelo algoritmo responsável por esta região.`
+    comment: `Percentual de suspeita de ${displayedName}: ${percentage}%. Este percentual é calculado a partir do score normalizado produzido pelo algoritmo responsável por esta região.`
   };
 }
 
@@ -118,8 +116,6 @@ export async function generateCurrentAnalysisReport() {
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9.5);
-        doc.text(item.coordinates, margin, y);
-        y += 5;
 
         const lines = doc.splitTextToSize(item.comment, pageWidth - 2 * margin);
         doc.text(lines, margin, y);
