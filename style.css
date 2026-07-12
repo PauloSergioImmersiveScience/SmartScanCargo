@@ -110,7 +110,7 @@ select:focus {
 
 .upload-row {
   display: grid;
-  grid-template-columns: 215px minmax(280px, 1fr);
+  grid-template-columns: 180px minmax(280px, 1fr);
   gap: 6px;
   align-items: center;
   min-width: 0;
@@ -127,7 +127,7 @@ select:focus {
 .upload-action {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   width: 100%;
   min-height: 30px;
   margin: 0;
@@ -259,7 +259,7 @@ select:focus {
   flex-wrap: wrap;
   margin: 10px 0 12px;
   padding: 8px 10px;
-  border-radius: 7px;
+  border-radius: 8px;
   background: #f6f8fb;
   border: 1px solid #dfe4ec;
   font-size: 13px;
@@ -300,13 +300,13 @@ canvas {
 }
 
 .danger {
-  min-width: 220px;
-  padding: 7px 16px;
+  min-width: 280px;
+  padding: 10px 22px;
   border-radius: 8px;
   background: #ff1f1f;
   color: #000000;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(242, 29, 29, 0.22);
+  font-size: 17px;
+  box-shadow: 0 3px 8px rgba(242, 29, 29, 0.24);
 }
 
 .danger:disabled {
@@ -386,7 +386,6 @@ canvas {
   .buttons .btn {
     flex: 1;
   }
-  }
 
   .example-selector .btn {
     width: 100%;
@@ -398,43 +397,44 @@ canvas {
   }
 }
 
-/* Botão de carregamento da imagem do dispositivo em amarelo */
-.local-upload-action {
-  background: #f4c430;
-  color: #1f2937;
-}
+/* ==========================================================
+   Ajustes finais solicitados
+   ========================================================== */
 
-.local-upload-action:hover {
-  background: #dcae1f;
-}
-
-/* Ajustes finais da interface */
-
-/* Botão para carregar imagem do dispositivo: amarelo */
+/* Primeira barra: amarela */
 .local-upload-action {
   background: #f4c430 !important;
   color: #1f2937 !important;
 }
 
 .local-upload-action:hover {
-  background: #dcae1f !important;
+  background: #d8aa12 !important;
 }
 
-/* Botão vermelho ajustado ao tamanho do texto */
+/* Segunda barra permanece azul */
+.example-upload-action {
+  background: #3049c9;
+  color: #ffffff;
+}
+
+/* Botão vermelho somente do tamanho do texto */
 .suspect-action {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 12px 0 10px;
 }
 
-.suspect-action .danger {
+#btnSuspect {
   display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
   width: auto !important;
   min-width: 0 !important;
-  max-width: max-content;
+  max-width: none !important;
   flex: 0 0 auto !important;
-  padding: 8px 18px;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 18px !important;
+  border-radius: 8px;
   white-space: nowrap;
+  font-size: 14px;
 }
