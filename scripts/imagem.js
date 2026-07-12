@@ -7,7 +7,9 @@ import {
   bboxInfoText,
   btnShowHemd,
   btnShowXray,
-  btnSuspect
+  btnSuspect,
+  hemdMissingModal,
+  btnCloseHemdModal
 } from "./dom.js";
 import { state } from "./state.js";
 import { resetSelection, setStatus } from "./ui.js";
@@ -55,57 +57,45 @@ export function updateViewButtons() {
   btnSuspect.disabled = !hasXray || !showingXray;
 }
 
-function drawMissingHemdMessage() {
-  const width = hemdCanvas.width;
-  const height = hemdCanvas.height;
-  const message = "Não foi possível encontrar a imagem HEMD correspondente!";
-
-  hemdCtx.save();
-  hemdCtx.clearRect(0, 0, width, height);
-  hemdCtx.fillStyle = "#111827";
-  hemdCtx.fillRect(0, 0, width, height);
-
-  const fontSize = Math.max(18, Math.min(42, Math.round(width / 28)));
-  hemdCtx.font = `600 ${fontSize}px Arial`;
-  hemdCtx.textAlign = "center";
-  hemdCtx.textBaseline = "middle";
-  hemdCtx.fillStyle = "#ffffff";
-
-  const maxTextWidth = width * 0.82;
-  const words = message.split(" ");
-  const lines = [];
-  let currentLine = "";
-
-  for (const word of words) {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    if (hemdCtx.measureText(testLine).width <= maxTextWidth || !currentLine) {
-      currentLine = testLine;
-    } else {
-      lines.push(currentLine);
-      currentLine = word;
-    }
-  }
-  if (currentLine) lines.push(currentLine);
-
-  const lineHeight = fontSize * 1.3;
-  const firstY = height / 2 - ((lines.length - 1) * lineHeight) / 2;
-
-  lines.forEach((line, index) => {
-    hemdCtx.fillText(line, width / 2, firstY + index * lineHeight);
-  });
-
-  hemdCtx.restore();
+function openMissingHemdModal() {
+  hemdMissingModal.hidden = false;
+  document.body.classList.add("modal-open");
+  btnCloseHemdModal.focus();
 }
+
+function closeMissingHemdModal() {
+  hemdMissingModal.hidden = true;
+  document.body.classList.remove("modal-open");
+  btnShowHemd.focus();
+}
+
+btnCloseHemdModal.addEventListener("click", closeMissingHemdModal);
+hemdMissingModal.addEventListener("click", (event) => {
+  if (event.target.matches("[data-close-hemd-modal]")) {
+    closeMissingHemdModal();
+  }
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !hemdMissingModal.hidden) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    closeMissingHemdModal();
+  }
+}, true);
 
 export function showImageView(view) {
   if (!state.currentImageData) return;
 
+  if (view === "hemd" && !state.hemdImageData) {
+    openMissingHemdModal();
+    setStatus("Não foi possível encontrar a imagem HEMD correspondente!");
+    updateViewButtons();
+    return;
+  }
+
   state.activeView = view === "hemd" ? "hemd" : "xray";
   const showingXray = state.activeView === "xray";
-
-  if (!showingXray && !state.hemdImageData) {
-    drawMissingHemdMessage();
-  }
 
   imageCanvas.classList.toggle("canvas-visible", showingXray);
   hemdCanvas.classList.toggle("canvas-visible", !showingXray);
@@ -118,12 +108,9 @@ export function showImageView(view) {
   if (showingXray) {
     imageNameText.textContent = state.currentFileName;
     setStatus("Visualizando a imagem X-RAY.");
-  } else if (state.hemdImageData) {
+  } else {
     imageNameText.textContent = state.hemdFileName;
     setStatus("Visualizando a imagem HEMD.");
-  } else {
-    imageNameText.textContent = "HEMD correspondente não encontrada";
-    setStatus("Não foi possível encontrar a imagem HEMD correspondente!");
   }
 }
 
