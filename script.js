@@ -44,7 +44,8 @@ import {
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
 
 // Importa a detecção automática de possíveis regiões suspeitas.
-import { findPossibleSuspectRegions } from "./scripts/detector.js?v=4";
+import { findPossibleSuspectRegions } from "./scripts/detector.js?v=5";
+import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=1";
 
 // Importa as funções responsáveis pelo controle de acesso.
 import {
@@ -176,7 +177,22 @@ btnSuspect.addEventListener("click", async () => {
   btnSuspect.textContent = "Analisando...";
 
   try {
-    await findPossibleSuspectRegions();
+    const currentResult = await findPossibleSuspectRegions();
+    if (!currentResult) return;
+
+    const fftBoxes = await findFftSuspectRegions({
+      yMin: currentResult.lup,
+      yMax: currentResult.ldw - 1
+    });
+
+    setStatus(
+      `${currentResult.boxes.length} BB(s) do algoritmo atual e ` +
+      `${fftBoxes.length} BB(s) do algoritmo FFT foram sobrepostos dentro da região R. ` +
+      `Região R: y=[${currentResult.lup}, ${currentResult.ldw - 1}].`
+    );
+  } catch (error) {
+    console.error(error);
+    setStatus(`Não foi possível concluir a análise combinada: ${error.message}`);
   } finally {
     btnSuspect.disabled = false;
     btnSuspect.textContent = originalText;
