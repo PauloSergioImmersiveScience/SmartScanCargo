@@ -4,6 +4,8 @@ export const state = {
   selectedPoints: [],
   previewPoint: null,
   lastBox: null,
+  currentDetectorBoxes: [],
+  fftDetectorBoxes: [],
   suspectBoxes: [],
   currentFileName: ""
 };

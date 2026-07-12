@@ -308,7 +308,7 @@ function groupIntervals(intervals, maxGap) {
   return grouped;
 }
 
-function detectBoxes(imageData) {
+export function detectCurrentAlgorithmBoxes(imageData) {
   const originalW = imageData.width;
   const originalH = imageData.height;
   // Padroniza a resolução da análise em qualquer dispositivo.
@@ -418,6 +418,7 @@ function detectBoxes(imageData) {
   const invScaleY = originalH / height;
   return {
     boxes: grouped.map(([x1, x2]) => ({
+      source: "current",
       xMin: Math.max(0, Math.round(x1 * invScaleX)),
       xMax: Math.min(originalW - 1, Math.round(x2 * invScaleX)),
       yMin: Math.max(0, Math.round(lup * invScaleY)),
@@ -441,13 +442,14 @@ export async function findPossibleSuspectRegions() {
   await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 20)));
 
   try {
-    const result = detectBoxes(state.currentImageData);
-    state.suspectBoxes = result.boxes;
+    const result = detectCurrentAlgorithmBoxes(state.currentImageData);
+    state.currentDetectorBoxes = result.boxes;
+    state.suspectBoxes = [...state.currentDetectorBoxes, ...(state.fftDetectorBoxes || [])];
     redrawCanvas();
 
     if (!result.boxes.length) {
-      setStatus("Nenhuma possível região suspeita foi encontrada.");
-      return;
+      setStatus("O algoritmo atual não encontrou BBs; a região R será mantida para a análise FFT.");
+      return result;
     }
 
     setStatus(
@@ -455,15 +457,20 @@ export async function findPossibleSuspectRegions() {
       `Faixa automática: y=[${result.lup}, ${result.ldw - 1}]. ` +
       "Você pode equalizar dentro ou fora dos bounding boxes normalmente."
     );
+    return result;
   } catch (error) {
     console.error(error);
-    state.suspectBoxes = [];
+    state.currentDetectorBoxes = [];
+    state.suspectBoxes = [...(state.fftDetectorBoxes || [])];
     redrawCanvas();
     setStatus(`Não foi possível executar a detecção: ${error.message}`);
+    return null;
   }
 }
 
 export function clearSuspectRegions() {
+  state.currentDetectorBoxes = [];
+  state.fftDetectorBoxes = [];
   state.suspectBoxes = [];
   redrawCanvas();
 }

@@ -47,7 +47,8 @@ export function redrawCanvas() {
       const width = box.xMax - box.xMin + 1;
       const height = box.yMax - box.yMin + 1;
       ctx.strokeRect(box.xMin, box.yMin, width, height);
-      ctx.fillText(`BB ${index + 1}`, box.xMin + 6, Math.max(18, box.yMin - 8));
+      const prefix = box.source === "fft" ? "FFT" : "BB";
+      ctx.fillText(`${prefix} ${index + 1}`, box.xMin + 6, Math.max(18, box.yMin - 8));
     });
     ctx.restore();
   }
@@ -108,6 +109,8 @@ export function loadImageFromSource(src, fileName) {
 
     state.currentFileName = fileName;
     state.lastBox = null;
+    state.currentDetectorBoxes = [];
+    state.fftDetectorBoxes = [];
     state.suspectBoxes = [];
 
     imageNameText.textContent = fileName;
