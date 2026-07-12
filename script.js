@@ -4,6 +4,7 @@ import {
   btnLogin,
   btnLogout,
   imageLoader,
+  localImageSelect,
   hemdLoader,
   exampleImageSelect,
   btnLoadExample,
@@ -55,10 +56,48 @@ function filesAreInSameDirectory(fileA, fileB) {
   return getSelectedDirectory(fileA) === getSelectedDirectory(fileB);
 }
 
-function setLocalDisplay(text) {
-  const display = document.getElementById("localFileDisplay");
-  if (display) display.textContent = text;
+let selectedFolderFiles = [];
+
+function resetLocalImageSelect(message = "Primeiro selecione uma pasta") {
+  localImageSelect.innerHTML = "";
+  const option = document.createElement("option");
+  option.value = "";
+  option.textContent = message;
+  localImageSelect.appendChild(option);
+  localImageSelect.disabled = true;
 }
+
+function populateLocalImageSelect(files) {
+  const xrayFiles = files
+    .filter((file) => extractIndex(file.name, "xray"))
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+  localImageSelect.innerHTML = "";
+
+  if (xrayFiles.length === 0) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Nenhuma imagem xray{i} encontrada";
+    localImageSelect.appendChild(option);
+    localImageSelect.disabled = true;
+    return;
+  }
+
+  const firstOption = document.createElement("option");
+  firstOption.value = "";
+  firstOption.textContent = "Selecione uma imagem X-RAY";
+  localImageSelect.appendChild(firstOption);
+
+  xrayFiles.forEach((file) => {
+    const option = document.createElement("option");
+    option.value = file.webkitRelativePath || file.name;
+    option.textContent = file.name;
+    localImageSelect.appendChild(option);
+  });
+
+  localImageSelect.disabled = false;
+}
+
 
 function resetExampleSelection() {
   exampleImageSelect.value = "";
@@ -88,7 +127,8 @@ btnLoadExample.addEventListener("click", async () => {
 
   imageLoader.value = "";
   hemdLoader.value = "";
-  setLocalDisplay("Selecione uma imagem");
+  selectedFolderFiles = [];
+  resetLocalImageSelect();
 
   const xrayURL = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(example.xray)}`;
   const hemdURL = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(example.hemd)}`;
@@ -108,39 +148,46 @@ async function loadLocalPair(xrayFile, hemdFile) {
   }
 }
 
-imageLoader.addEventListener("change", async (event) => {
-  const files = Array.from(event.target.files || []);
-  if (files.length === 0) {
-    setLocalDisplay("Selecione uma imagem");
+imageLoader.addEventListener("change", (event) => {
+  selectedFolderFiles = Array.from(event.target.files || []);
+
+  if (selectedFolderFiles.length === 0) {
+    resetLocalImageSelect();
     return;
   }
 
-  const xrayFile = files.find((file) => extractIndex(file.name, "xray"));
+  populateLocalImageSelect(selectedFolderFiles);
+  resetExampleSelection();
+  setStatus("Pasta carregada. Agora selecione uma imagem X-RAY na lista.");
+});
+
+localImageSelect.addEventListener("change", async () => {
+  const selectedPath = localImageSelect.value;
+  if (!selectedPath) return;
+
+  const xrayFile = selectedFolderFiles.find(
+    (file) => (file.webkitRelativePath || file.name) === selectedPath
+  );
+
   if (!xrayFile) {
-    setStatus("Selecione uma imagem com nome no formato xray{i}.png.");
-    imageLoader.value = "";
+    setStatus("Não foi possível localizar a imagem X-RAY selecionada.");
     return;
   }
 
   const index = extractIndex(xrayFile.name, "xray");
   const expectedHemdName = `hemd${index}.png`;
-  const hemdFile = files.find(
+
+  const hemdFile = selectedFolderFiles.find(
     (file) =>
       file.name.toLowerCase() === expectedHemdName.toLowerCase() &&
       filesAreInSameDirectory(xrayFile, file)
   );
-
-  setLocalDisplay(xrayFile.name);
-  resetExampleSelection();
 
   if (hemdFile) {
     await loadLocalPair(xrayFile, hemdFile);
     return;
   }
 
-  // Para arquivos locais, a HEMD correspondente só é aceita quando foi
-  // selecionada no mesmo diretório da X-RAY. O navegador não pode acessar
-  // silenciosamente outros arquivos da pasta sem que o usuário os selecione.
   const xrayURL = URL.createObjectURL(xrayFile);
   try {
     await loadXrayOnlyFromSource(xrayURL, xrayFile.name);
@@ -217,5 +264,6 @@ window.addEventListener("keydown", (event) => {
 });
 window.addEventListener("resize", redrawCanvas);
 
+resetLocalImageSelect();
 updateViewButtons();
 restoreLoginState();

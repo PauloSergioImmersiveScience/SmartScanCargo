@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmartScanCargo - Equalização Local</title>
-  <link rel="stylesheet" href="style.css?v=20260712-5" />
+  <link rel="stylesheet" href="style.css?v=20260712-6" />
 </head>
 <body>
   <section id="loginScreen" class="login-screen">
@@ -46,10 +46,9 @@
           accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff"
         />
         <input id="hemdLoader" class="visually-hidden-file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" />
-        <label class="selection-display" for="imageLoader">
-          <span id="localFileDisplay">Selecione uma pasta</span>
-          <span class="selection-arrow" aria-hidden="true">⌄</span>
-        </label>
+        <select id="localImageSelect" aria-label="Selecione uma imagem X-RAY da pasta" disabled>
+          <option value="">Primeiro selecione uma pasta</option>
+        </select>
       </div>
 
       <div class="upload-row example-upload-row">
@@ -92,7 +91,7 @@
     <section class="help-card">
       <h2>Controles</h2>
       <ul>
-        <li><strong>Escolher imagem no seu dispositivo:</strong> abre uma imagem armazenada no computador, celular ou tablet.</li>
+        <li><strong>Escolher imagem no seu dispositivo:</strong> abre uma pasta e lista as imagens X-RAY encontradas para seleção.</li>
         <li><strong>Imagem exemplo do GitHub:</strong> carrega automaticamente o par <code>xray{i}.png</code> e <code>hemd{i}.png</code>.</li>
         <li><strong>Clique esquerdo 1:</strong> define o ponto p1.</li>
         <li><strong>Clique esquerdo 2:</strong> define o ponto p2 e equaliza o bounding box.</li>
@@ -133,6 +132,6 @@
     </div>
   </div>
 
-  <script type="module" src="script.js?v=9"></script>
+  <script type="module" src="script.js?v=10"></script>
 </body>
 </html>
