@@ -108,6 +108,10 @@ btnLoadExample.addEventListener("click", () => {
 
   // Limpa a seleção local para deixar clara a origem da imagem atual.
   imageLoader.value = "";
+  const localFileDisplay = document.getElementById("localFileDisplay");
+  if (localFileDisplay) {
+    localFileDisplay.textContent = "Selecione uma imagem";
+  }
 
   const imageURL = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(fileName)}`;
   loadImageFromSource(imageURL, fileName);
@@ -121,6 +125,12 @@ btnLoadExample.disabled = true;
 imageLoader.addEventListener("change", (event) => {
   // Obtém o primeiro arquivo selecionado pelo usuário.
   const file = event.target.files[0];
+
+  // Atualiza o texto do campo visual do arquivo local.
+  const localFileDisplay = document.getElementById("localFileDisplay");
+  if (localFileDisplay) {
+    localFileDisplay.textContent = file ? file.name : "Selecione uma imagem";
+  }
 
   // Interrompe a função caso nenhum arquivo tenha sido selecionado.
   if (!file) return;

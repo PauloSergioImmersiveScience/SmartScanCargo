@@ -32,19 +32,29 @@
     </header>
 
     <section class="toolbar">
-      <div class="field-group local-image-group">
-        <label for="imageLoader">Carregar imagem do seu dispositivo</label>
-        <input id="imageLoader" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" />
+      <div class="upload-row local-upload-row">
+        <label class="upload-action local-upload-action" for="imageLoader">
+          Carregar imagem do seu dispositivo
+        </label>
+        <input
+          id="imageLoader"
+          class="visually-hidden-file"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff"
+        />
+        <label class="selection-display" for="imageLoader">
+          <span id="localFileDisplay">Selecione uma imagem</span>
+          <span class="selection-arrow" aria-hidden="true">⌄</span>
+        </label>
       </div>
 
-      <div class="field-group example-group">
-        <label for="exampleImageSelect">Carregar imagem exemplo</label>
-        <div class="example-selector">
-          <button id="btnLoadExample" class="btn example" type="button">Carregar exemplo</button>
-          <select id="exampleImageSelect">
-            <option value="">Selecione uma imagem</option>
-          </select>
-        </div>
+      <div class="upload-row example-upload-row">
+        <button id="btnLoadExample" class="upload-action example-upload-action" type="button">
+          Carregar imagem exemplo
+        </button>
+        <select id="exampleImageSelect" aria-label="Selecione uma imagem exemplo">
+          <option value="">Selecione uma imagem</option>
+        </select>
       </div>
 
       <div class="buttons">
