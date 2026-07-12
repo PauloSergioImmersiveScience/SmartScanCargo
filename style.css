@@ -754,3 +754,60 @@ body.modal-open {
   .config-actions .btn { flex: 1 1 45%; }
 }
 
+/* Glossário alfabético dos parâmetros */
+.config-glossary {
+  margin: 8px 0 20px;
+  padding: 18px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.config-glossary h3 {
+  margin: 0 0 4px;
+  color: #1e293b;
+  font-size: 18px;
+}
+
+.config-glossary-intro {
+  margin: 0 0 14px;
+  color: #64748b;
+}
+
+.config-glossary-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.config-glossary-item {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.config-glossary-item dt {
+  margin: 0;
+  color: #0f172a;
+  font-family: Consolas, "Courier New", monospace;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.config-glossary-item dd {
+  margin: 0;
+  color: #475569;
+  line-height: 1.45;
+}
+
+@media (max-width: 680px) {
+  .config-glossary-item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

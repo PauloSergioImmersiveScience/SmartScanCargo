@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmartScanCargo - Equalização Local</title>
-  <link rel="stylesheet" href="style.css?v=20260712-40" />
+  <link rel="stylesheet" href="style.css?v=20260712-41" />
 </head>
 <body>
   <section id="loginScreen" class="login-screen">
@@ -199,6 +199,139 @@
 <label class="config-field"><span>FFT_SCORE_THRESHOLD</span><input name="fft.FFT_SCORE_THRESHOLD" type="number" step="0.01" /></label>
 <label class="config-check"><input name="fft.REQUIRE_FFT_DETECTOR" type="checkbox" /><span>REQUIRE_FFT_DETECTOR</span></label></div>
         </fieldset>
+
+        <section class="config-glossary" aria-labelledby="configGlossaryTitle">
+          <h3 id="configGlossaryTitle">Glossário dos parâmetros</h3>
+          <p class="config-glossary-intro">
+            Relação alfabética dos parâmetros disponíveis nesta janela.
+          </p>
+          <dl class="config-glossary-list">
+            <div class="config-glossary-item">
+              <dt>ANALYSIS_WIDTH</dt>
+              <dd>Largura, em pixels, usada para redimensionar a imagem durante a análise, preservando a proporção original.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>APPLY_MORPHOLOGY</dt>
+              <dd>Ativa ou desativa o pós-processamento morfológico aplicado à máscara de regiões suspeitas.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>BB_AREA_MIN_PERCENT</dt>
+              <dd>Define a menor área percentual que um componente deve possuir para gerar um bounding box.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>BBOX_MARGIN</dt>
+              <dd>Acrescenta uma margem, em pixels, ao redor de cada bounding box detectado.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>BBOX_THICKNESS</dt>
+              <dd>Define a espessura, em pixels, das linhas usadas para desenhar os bounding boxes.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>CLOSE_ITERATIONS</dt>
+              <dd>Define quantas iterações de fechamento morfológico serão aplicadas à máscara.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>D</dt>
+              <dd>Define a porcentagem vertical usada para estabelecer a região pré-segmentada R, respeitando 0 < D ≤ 1.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>EDGE_PERC</dt>
+              <dd>Percentil empregado para selecionar as bordas mais relevantes na análise estrutural.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>EPS</dt>
+              <dd>Pequena constante numérica usada para evitar divisões por zero e instabilidades computacionais.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>FFT_ENERGY_ABS_MIN</dt>
+              <dd>Limiar mínimo absoluto da energia relativa de altas frequências para considerar uma região suspeita.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>FFT_LOCAL_KERNEL_SIZE</dt>
+              <dd>Tamanho da janela local usada para calcular média, variância e z-score no mapa de energia FFT.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>FFT_SCORE_THRESHOLD</dt>
+              <dd>Limiar aplicado ao score FFT normalizado para decidir se uma região será marcada como suspeita.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>FFT_STEP</dt>
+              <dd>Passo de deslocamento entre janelas FFT; vazio significa usar automaticamente metade de FFT_WINDOW_SIZE.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>FFT_WINDOW_SIZE</dt>
+              <dd>Tamanho da janela quadrada usada no cálculo local da transformada de Fourier.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>FFT_Z_THRESHOLD</dt>
+              <dd>Limiar mínimo do z-score da energia FFT necessário para aceitar uma detecção.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>GAUSS_K</dt>
+              <dd>Tamanho ímpar do kernel gaussiano usado na suavização da imagem ou dos mapas intermediários.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>GAUSS_SIG</dt>
+              <dd>Desvio-padrão da função gaussiana usada na etapa de suavização.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>GROUP_GAP_FACTOR</dt>
+              <dd>Controla a distância máxima permitida para agrupar janelas vizinhas em uma mesma região.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>HIGH_FREQ_RADIUS</dt>
+              <dd>Raio normalizado que separa baixas e altas frequências no domínio da FFT.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>MAX_COMPONENT_AREA</dt>
+              <dd>Área máxima opcional, em pixels, permitida para um componente conectado; vazio remove o limite superior.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>MORPH_ITERATIONS</dt>
+              <dd>Número de iterações morfológicas aplicadas no detector de regiões grandes despadronizadas.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>MORPH_KERNEL_SIZE</dt>
+              <dd>Tamanho ímpar do kernel usado nas operações morfológicas.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>N_BINS</dt>
+              <dd>Quantidade de divisões do histograma de orientações usado na análise das bordas.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>OPEN_ITERATIONS</dt>
+              <dd>Define quantas iterações de abertura morfológica serão aplicadas à máscara.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>REQUIRE_FFT_DETECTOR</dt>
+              <dd>Quando ativado, exige simultaneamente os critérios de energia absoluta, z-score e score FFT.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>SMOOTH</dt>
+              <dd>Ativa ou desativa a suavização gaussiana antes da análise estrutural.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>TOP_N</dt>
+              <dd>Quantidade máxima de janelas ou regiões de maior score consideradas na etapa de seleção.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>WINDOW_RATIO</dt>
+              <dd>Define o tamanho relativo das janelas de análise em relação às dimensões da imagem.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>W_COHERENCE</dt>
+              <dd>Peso atribuído à coerência de orientações no cálculo do score final.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>W_DENSITY</dt>
+              <dd>Peso atribuído à densidade de bordas no cálculo do score final.</dd>
+            </div>
+            <div class="config-glossary-item">
+              <dt>W_ENTROPY</dt>
+              <dd>Peso atribuído à entropia no cálculo do score final.</dd>
+            </div>
+          </dl>
+        </section>
         <p id="configValidation" class="config-validation" role="alert"></p>
         <footer class="config-actions">
           <button id="btnConfigDefaults" class="btn secondary" type="button">Restaurar padrões</button>
