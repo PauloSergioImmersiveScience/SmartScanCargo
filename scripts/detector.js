@@ -2,28 +2,8 @@ import { imageCanvas } from "./dom.js";
 import { state } from "./state.js";
 import { redrawCanvas } from "./imagem.js";
 import { setStatus } from "./ui.js";
+import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
 
-// ==========================================================
-// Parâmetros equivalentes ao código Python de detecção
-// ==========================================================
-const D = 0.6;
-const MORPH_KERNEL_SIZE = 3;
-const MORPH_ITERATIONS = 10;
-// Largura interna fixa usada em todas as plataformas.
-const ANALYSIS_WIDTH = 1200;
-
-// Proporção da janela em relação à largura de referência do código Python.
-const WINDOW_RATIO = 450 / 4728;
-const TOP_N = 8;
-const N_BINS = 18;
-const SMOOTH = true;
-const GAUSS_K = 5;
-const GAUSS_SIG = 1.0;
-const EDGE_PERC = 75;
-const GROUP_GAP_FACTOR = 1.0;
-const W_ENTROPY = 1.0;
-const W_COHERENCE = 1.0;
-const W_DENSITY = 1.0;
 
 // A imagem é sempre analisada com a mesma largura interna.
 // Isso evita resultados diferentes causados por resoluções distintas
@@ -92,43 +72,38 @@ function otsuThreshold(gray, y0, y1, width) {
   return threshold;
 }
 
-function erode3x3(src, width, height) {
+function erodeBinary(src, width, height, kernelSize) {
   const dst = new Uint8Array(src.length);
-  for (let y = 1; y < height - 1; y++) {
-    for (let x = 1; x < width - 1; x++) {
-      const i = y * width + x;
-      if (
-        src[i - width - 1] && src[i - width] && src[i - width + 1] &&
-        src[i - 1] && src[i] && src[i + 1] &&
-        src[i + width - 1] && src[i + width] && src[i + width + 1]
-      ) dst[i] = 255;
+  const radius = Math.floor(kernelSize / 2);
+  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+    let ok = 1;
+    for (let dy = -radius; dy <= radius && ok; dy++) for (let dx = -radius; dx <= radius; dx++) {
+      const nx = x + dx, ny = y + dy;
+      if (nx < 0 || nx >= width || ny < 0 || ny >= height || !src[ny * width + nx]) { ok = 0; break; }
     }
+    if (ok) dst[y * width + x] = 255;
   }
   return dst;
 }
 
-function dilate3x3(src, width, height) {
+function dilateBinary(src, width, height, kernelSize) {
   const dst = new Uint8Array(src.length);
-  for (let y = 1; y < height - 1; y++) {
-    for (let x = 1; x < width - 1; x++) {
-      const i = y * width + x;
-      if (
-        src[i - width - 1] || src[i - width] || src[i - width + 1] ||
-        src[i - 1] || src[i] || src[i + 1] ||
-        src[i + width - 1] || src[i + width] || src[i + width + 1]
-      ) dst[i] = 255;
+  const radius = Math.floor(kernelSize / 2);
+  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+    let on = 0;
+    for (let dy = -radius; dy <= radius && !on; dy++) for (let dx = -radius; dx <= radius; dx++) {
+      const nx = x + dx, ny = y + dy;
+      if (nx >= 0 && nx < width && ny >= 0 && ny < height && src[ny * width + nx]) { on = 1; break; }
     }
+    if (on) dst[y * width + x] = 255;
   }
   return dst;
 }
 
-function opening(binary, width, height, iterations) {
-  if (MORPH_KERNEL_SIZE !== 3) {
-    throw new Error("A versão Web atual usa MORPH_KERNEL_SIZE = 3.");
-  }
+function opening(binary, width, height, iterations, kernelSize) {
   let result = binary;
-  for (let i = 0; i < iterations; i++) result = erode3x3(result, width, height);
-  for (let i = 0; i < iterations; i++) result = dilate3x3(result, width, height);
+  for (let i = 0; i < iterations; i++) result = erodeBinary(result, width, height, kernelSize);
+  for (let i = 0; i < iterations; i++) result = dilateBinary(result, width, height, kernelSize);
   return result;
 }
 
@@ -309,6 +284,11 @@ function groupIntervals(intervals, maxGap) {
 }
 
 export function detectCurrentAlgorithmBoxes(imageData) {
+  const {
+    D, MORPH_KERNEL_SIZE, MORPH_ITERATIONS, ANALYSIS_WIDTH, WINDOW_RATIO,
+    TOP_N, N_BINS, SMOOTH, GAUSS_K, GAUSS_SIG, EDGE_PERC,
+    GROUP_GAP_FACTOR, W_ENTROPY, W_COHERENCE, W_DENSITY
+  } = getAlgorithmConfig().current;
   const originalW = imageData.width;
   const originalH = imageData.height;
   // Padroniza a resolução da análise em qualquer dispositivo.
@@ -335,7 +315,7 @@ export function detectCurrentAlgorithmBoxes(imageData) {
     }
   }
 
-  binary = opening(binary, width, centralH, MORPH_ITERATIONS);
+  binary = opening(binary, width, centralH, MORPH_ITERATIONS, MORPH_KERNEL_SIZE);
   const largest = largestWhiteComponent(binary, width, centralH);
   const lup = centralY0 + largest.yMin;
   const ldw = centralY0 + largest.yMax + 1;

@@ -33,3 +33,14 @@ export const btnReport = document.getElementById("btnReport");
 
 export const hemdMissingModal = document.getElementById("hemdMissingModal");
 export const btnCloseHemdModal = document.getElementById("btnCloseHemdModal");
+export const btnConfig = document.getElementById("btnConfig");
+export const configModal = document.getElementById("configModal");
+export const btnConfigClose = document.getElementById("btnConfigClose");
+export const btnConfigCancel = document.getElementById("btnConfigCancel");
+export const btnConfigApply = document.getElementById("btnConfigApply");
+export const btnConfigSave = document.getElementById("btnConfigSave");
+export const btnConfigDefaults = document.getElementById("btnConfigDefaults");
+export const configForm = document.getElementById("configForm");
+export const configValidation = document.getElementById("configValidation");
+export const configActiveLabel = document.getElementById("configActiveLabel");
+

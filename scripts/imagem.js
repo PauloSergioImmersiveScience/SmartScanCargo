@@ -10,9 +10,10 @@ import {
   btnSuspect,
   hemdMissingModal,
   btnCloseHemdModal
-} from "./dom.js?v=20";
+} from "./dom.js?v=40";
 import { state } from "./state.js";
 import { resetSelection, setStatus } from "./ui.js";
+import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
 
 function cloneImageData(imageData) {
   return new ImageData(
@@ -123,10 +124,11 @@ export function redrawCanvas() {
     ctx.save();
     ctx.strokeStyle = "#ff1f1f";
     ctx.fillStyle = "#ff1f1f";
-    ctx.lineWidth = Math.max(3, Math.round(imageCanvas.width / 500));
+    ctx.lineWidth = Math.max(1, getAlgorithmConfig().fft.BBOX_THICKNESS);
     ctx.font = `${Math.max(14, Math.round(imageCanvas.width / 90))}px Arial`;
 
     state.suspectBoxes.forEach((box, index) => {
+      ctx.lineWidth = Math.max(1, box.thickness || getAlgorithmConfig().fft.BBOX_THICKNESS);
       const width = box.xMax - box.xMin + 1;
       const height = box.yMax - box.yMin + 1;
       ctx.strokeRect(box.xMin, box.yMin, width, height);

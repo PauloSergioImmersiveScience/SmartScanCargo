@@ -1,27 +1,26 @@
 import { state } from "./state.js";
 import { redrawCanvas } from "./imagem.js";
 import { setStatus } from "./ui.js";
+import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
 
-// ==========================================================
-// Parâmetros do Algoritmo A: análise FFT local
-// ==========================================================
-const ANALYSIS_WIDTH = 600;
-const FFT_WINDOW_SIZE = 31;
-const FFT_STEP = null; // null => FFT_WINDOW_SIZE // 2
-const HIGH_FREQ_RADIUS = 0.25;
-const FFT_LOCAL_KERNEL_SIZE = 31;
-const FFT_ENERGY_ABS_MIN = 0.30;
-const FFT_Z_THRESHOLD = 0.80;
-const FFT_SCORE_THRESHOLD = 0.05;
-const REQUIRE_FFT_DETECTOR = true;
 
-const APPLY_MORPHOLOGY = true;
-const OPEN_ITERATIONS = 0;
-const CLOSE_ITERATIONS = 2;
-const BB_AREA_MIN_PERCENT = 0.01;
-const MAX_COMPONENT_AREA = null;
-const BBOX_MARGIN = 20;
-const EPS = 1e-6;
+
+let ANALYSIS_WIDTH, FFT_WINDOW_SIZE, FFT_STEP, HIGH_FREQ_RADIUS;
+let FFT_LOCAL_KERNEL_SIZE, FFT_ENERGY_ABS_MIN, FFT_Z_THRESHOLD;
+let FFT_SCORE_THRESHOLD, REQUIRE_FFT_DETECTOR, APPLY_MORPHOLOGY;
+let MORPH_KERNEL_SIZE, OPEN_ITERATIONS, CLOSE_ITERATIONS;
+let BB_AREA_MIN_PERCENT, MAX_COMPONENT_AREA, BBOX_MARGIN, BBOX_THICKNESS, EPS;
+
+function refreshFftConfig() {
+  ({
+    ANALYSIS_WIDTH, FFT_WINDOW_SIZE, FFT_STEP, HIGH_FREQ_RADIUS,
+    FFT_LOCAL_KERNEL_SIZE, FFT_ENERGY_ABS_MIN, FFT_Z_THRESHOLD,
+    FFT_SCORE_THRESHOLD, REQUIRE_FFT_DETECTOR, APPLY_MORPHOLOGY,
+    MORPH_KERNEL_SIZE, OPEN_ITERATIONS, CLOSE_ITERATIONS,
+    BB_AREA_MIN_PERCENT, MAX_COMPONENT_AREA, BBOX_MARGIN,
+    BBOX_THICKNESS, EPS
+  } = getAlgorithmConfig().fft);
+}
 
 function imageDataToGray(imageData) {
   const { width, height, data } = imageData;
@@ -169,8 +168,9 @@ function morphology(binary, cols, rows, iterations, mode) {
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         let value = mode === "dilate" ? 0 : 1;
-        for (let dy = -1; dy <= 1; dy++) {
-          for (let dx = -1; dx <= 1; dx++) {
+        const radius = Math.floor(MORPH_KERNEL_SIZE / 2);
+        for (let dy = -radius; dy <= radius; dy++) {
+          for (let dx = -radius; dx <= radius; dx++) {
             const nx = x + dx, ny = y + dy;
             const v = nx >= 0 && nx < cols && ny >= 0 && ny < rows ? src[ny * cols + nx] : 0;
             if (mode === "dilate") value = Math.max(value, v);
@@ -238,13 +238,15 @@ function componentsToBoxes(binary, cols, rows, centersX, centersY, step, origina
       xMax: Math.min(originalW - 1, Math.round(ax1 * scaleX) + BBOX_MARGIN),
       yMin: Math.max(0, Math.round(ay0 * scaleY) - BBOX_MARGIN),
       yMax: Math.min(originalH - 1, Math.round(ay1 * scaleY) + BBOX_MARGIN),
-      source: "fft"
+      source: "fft",
+      thickness: BBOX_THICKNESS
     });
   }
   return boxes;
 }
 
 export async function detectFftBoxes(imageData, regionR) {
+  refreshFftConfig();
   const originalW = imageData.width, originalH = imageData.height;
   const analysisW = Math.min(ANALYSIS_WIDTH, originalW);
   const scale = analysisW / originalW;
