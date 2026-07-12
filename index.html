@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmartScanCargo - Equalização Local</title>
-  <link rel="stylesheet" href="style.css?v=20260712-2" />
+  <link rel="stylesheet" href="style.css?v=20260712-3" />
 </head>
 <body>
   <section id="loginScreen" class="login-screen">
@@ -40,8 +40,10 @@
           id="imageLoader"
           class="visually-hidden-file"
           type="file"
+          multiple
           accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff"
         />
+        <input id="hemdLoader" class="visually-hidden-file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" />
         <label class="selection-display" for="imageLoader">
           <span id="localFileDisplay">Selecione uma imagem</span>
           <span class="selection-arrow" aria-hidden="true">⌄</span>
@@ -71,23 +73,31 @@
 
     <section class="canvas-section">
       <div id="canvasWrapper" class="canvas-wrapper">
-        <canvas id="imageCanvas"></canvas>
+        <div class="canvas-stack">
+          <canvas id="hemdCanvas" aria-hidden="true"></canvas>
+          <canvas id="imageCanvas" class="canvas-visible" aria-hidden="false"></canvas>
+        </div>
       </div>
     </section>
 
-    <section class="suspect-action">
+    <section class="analysis-actions">
       <button id="btnSuspect" class="btn danger">Possible Suspected Regions</button>
+      <button id="btnShowHemd" class="btn view-toggle" disabled>HEMD</button>
+      <button id="btnShowXray" class="btn view-toggle" disabled>X-RAY</button>
+      <button id="btnReport" class="btn report" disabled>Emitir Relatório</button>
     </section>
 
     <section class="help-card">
       <h2>Controles</h2>
       <ul>
         <li><strong>Escolher imagem no seu dispositivo:</strong> abre uma imagem armazenada no computador, celular ou tablet.</li>
-        <li><strong>Imagem exemplo do GitHub:</strong> carrega uma das imagens disponíveis na pasta <code>ImagensTest</code> do projeto.</li>
+        <li><strong>Imagem exemplo do GitHub:</strong> carrega automaticamente o par <code>xray{i}.png</code> e <code>hemd{i}.png</code>.</li>
         <li><strong>Clique esquerdo 1:</strong> define o ponto p1.</li>
         <li><strong>Clique esquerdo 2:</strong> define o ponto p2 e equaliza o bounding box.</li>
         <li><strong>Clique direito:</strong> restaura a imagem original.</li>
         <li><strong>Possible Suspected Regions:</strong> executa o algoritmo atual e a análise FFT, mostrando os bounding boxes vermelhos sobrepostos dentro da região R.</li>
+        <li><strong>HEMD / X-RAY:</strong> alterna entre as duas imagens associadas, exibindo somente uma por vez.</li>
+        <li><strong>Emitir Relatório:</strong> reservado para uma implementação futura.</li>
         <li><strong>Bounding boxes vermelhos:</strong> são apenas indicações; a equalização continua sendo definida por dois cliques, dentro ou fora deles.</li>
         <li><strong>ESC:</strong> baixa a imagem equalizada atual.</li>
       </ul>
@@ -95,6 +105,6 @@
     </section>
   </main>
 
-  <script type="module" src="script.js?v=6"></script>
+  <script type="module" src="script.js?v=7"></script>
 </body>
 </html>
