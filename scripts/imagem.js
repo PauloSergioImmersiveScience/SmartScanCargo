@@ -8,6 +8,7 @@ import {
   btnShowHemd,
   btnShowXray,
   btnSuspect,
+  btnReport,
   hemdMissingModal,
   btnCloseHemdModal
 } from "./dom.js?v=40";
@@ -69,6 +70,10 @@ export function updateViewButtons() {
   btnShowHemd.disabled = !hasXray || !showingXray;
   btnShowXray.disabled = !hasXray || showingXray;
   btnSuspect.disabled = !hasXray || !showingXray;
+
+  // O relatório fica disponível sempre que existirem BBs atuais,
+  // inclusive depois de restaurações locais que recortem as regiões.
+  btnReport.disabled = !(state.suspectBoxes?.length > 0);
 }
 
 function openMissingHemdModal() {
@@ -454,6 +459,7 @@ export function restoreBoundingBoxRegion(p1, p2) {
   redrawCanvas();
 
   const remaining = state.suspectBoxes.length;
+  updateViewButtons();
   setStatus(
     `Região restaurada ao original. Os bounding boxes interceptados foram ` +
     `recortados; restam ${remaining} região(ões) marcada(s).`
