@@ -18,28 +18,27 @@ import {
   btnDownload,
   btnSuspect,
   btnShowHemd,
-  btnShowXray,
-  btnReport
-} from "./scripts/dom.js?v=50";
+  btnShowXray
+} from "./scripts/dom.js?v=40";
 
-import { state } from "./scripts/state.js";
-import { setStatus, resetSelection } from "./scripts/ui.js";
+import { state } from "./scripts/state.js?v=50";
+import { setStatus, resetSelection, resetLeftSelection, resetRestoreSelection } from "./scripts/ui.js?v=50";
 import {
   getCanvasPoint,
   loadXrayOnlyFromSource,
   loadHemdOnlyFromSource,
   redrawCanvas,
   restoreOriginalImage,
+  restoreBoundingBoxRegion,
   downloadEqualizedImage,
   showImageView,
   updateViewButtons
-} from "./scripts/imagem.js?v=40";
+} from "./scripts/imagem.js?v=50";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
-import { findPossibleSuspectRegions } from "./scripts/detector.js?v=50";
-import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=50";
+import { findPossibleSuspectRegions } from "./scripts/detector.js?v=40";
+import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=40";
 import { EXAMPLE_IMAGES, EXAMPLE_IMAGES_DIRECTORY } from "./scripts/examples.js?v=2";
 import { checkPassword, lockApp, restoreLoginState } from "./scripts/login.js";
-import { generateCurrentAnalysisReport } from "./scripts/report.js?v=50";
 
 btnLogin.addEventListener("click", checkPassword);
 passwordInput.addEventListener("keydown", (event) => {
@@ -97,7 +96,6 @@ imageLoader.addEventListener("change", async (event) => {
   }
 
   setLocalDisplay(localXrayDisplay, file.name);
-  btnReport.disabled = true;
   const url = URL.createObjectURL(file);
 
   try {
@@ -148,7 +146,6 @@ btnLoadExampleXray.addEventListener("click", async () => {
     return;
   }
 
-  btnReport.disabled = true;
   const url = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(example.xray)}`;
   await loadXrayOnlyFromSource(url, example.xray);
 
@@ -189,6 +186,8 @@ imageCanvas.addEventListener("click", (event) => {
   const point = getCanvasPoint(event);
   if (!point || !state.currentImageData) return;
 
+  resetRestoreSelection();
+  state.lastRestoreBox = null;
   state.selectedPoints.push(point);
   pointsCountText.textContent = String(state.selectedPoints.length);
 
@@ -210,7 +209,30 @@ imageCanvas.addEventListener("click", (event) => {
 
 imageCanvas.addEventListener("contextmenu", (event) => {
   event.preventDefault();
-  if (state.activeView === "xray") restoreOriginalImage();
+
+  if (state.activeView !== "xray" || !state.currentImageData) return;
+
+  const point = getCanvasPoint(event);
+  if (!point) return;
+
+  // O botão direito trabalha com sua própria seleção de dois pontos.
+  resetLeftSelection();
+  state.lastBox = null;
+  state.restorePoints.push(point);
+
+  if (state.restorePoints.length === 1) {
+    state.restorePreviewPoint = point;
+    setStatus(
+      `Primeiro ponto da restauração selecionado: (${point.x}, ${point.y}). ` +
+      `Clique com o botão direito no segundo ponto.`
+    );
+    redrawCanvas();
+    return;
+  }
+
+  const [p1, p2] = state.restorePoints;
+  state.restorePreviewPoint = null;
+  restoreBoundingBoxRegion(p1, p2);
 });
 
 btnRestore.addEventListener("click", restoreOriginalImage);
@@ -235,7 +257,6 @@ btnSuspect.addEventListener("click", async () => {
       `${currentResult.boxes.length} BB(s) do algoritmo atual e ` +
       `${fftBoxes.length} BB(s) do algoritmo FFT foram sobrepostos dentro da região R.`
     );
-    btnReport.disabled = false;
   } catch (error) {
     console.error(error);
     setStatus(`Não foi possível concluir a análise combinada: ${error.message}`);
@@ -246,7 +267,6 @@ btnSuspect.addEventListener("click", async () => {
 });
 
 btnDownload.addEventListener("click", downloadEqualizedImage);
-btnReport.addEventListener("click", generateCurrentAnalysisReport);
 
 window.addEventListener("keydown", (event) => {
   if (
