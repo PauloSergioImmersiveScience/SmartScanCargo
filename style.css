@@ -834,3 +834,48 @@ body.modal-open {
   box-shadow: none;
   vertical-align: middle;
 }
+
+/* Identidade visual SmartSCargo */
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.brand img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.brand-login {
+  justify-content: center;
+  margin: -8px 0 14px;
+}
+
+.brand-login img {
+  width: min(390px, 100%);
+}
+
+.brand-header {
+  margin: -5px 0 2px;
+}
+
+.brand-header img {
+  width: min(430px, 48vw);
+  max-height: 82px;
+  object-position: left center;
+}
+
+@media (max-width: 820px) {
+  .brand-header img {
+    width: min(430px, 90vw);
+  }
+}
+
+@media (max-width: 560px) {
+  .brand-login img,
+  .brand-header img {
+    width: 100%;
+  }
+}
