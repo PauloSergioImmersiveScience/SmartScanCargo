@@ -132,6 +132,11 @@ export function redrawCanvas() {
   ensureRestoreState();
   if (!state.currentImageData) return;
 
+  // Reinicia explicitamente os estilos do canvas.
+  // Isso impede que qualquer tracejado de versões anteriores permaneça ativo.
+  ctx.setLineDash([]);
+  ctx.lineDashOffset = 0;
+  ctx.globalAlpha = 1;
   ctx.putImageData(state.currentImageData, 0, 0);
 
   if (state.suspectBoxes?.length > 0) {
@@ -160,19 +165,7 @@ export function redrawCanvas() {
     ctx.restore();
   }
 
-  if (state.lastRestoreBox) {
-    ctx.save();
-    ctx.strokeStyle = "#22c55e";
-    ctx.setLineDash([12, 8]);
-    ctx.lineWidth = Math.max(2, Math.round(imageCanvas.width / 700));
-    ctx.strokeRect(
-      state.lastRestoreBox.xMin,
-      state.lastRestoreBox.yMin,
-      state.lastRestoreBox.width,
-      state.lastRestoreBox.height
-    );
-    ctx.restore();
-  }
+
 
   if (state.previewPoint) {
     ctx.save();
@@ -456,7 +449,7 @@ export function restoreBoundingBoxRegion(p1, p2) {
   );
 
   state.lastBox = null;
-  state.lastRestoreBox = box;
+  state.lastRestoreBox = null;
   resetRestoreSelectionLocal();
   redrawCanvas();
 
