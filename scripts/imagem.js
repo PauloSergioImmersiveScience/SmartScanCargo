@@ -12,7 +12,7 @@ import {
   btnCloseHemdModal
 } from "./dom.js?v=40";
 import { state } from "./state.js";
-import { resetSelection, setStatus } from "./ui.js";
+import { resetSelection, resetRestoreSelection, setStatus } from "./ui.js?v=50";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
 
 function cloneImageData(imageData) {
@@ -146,6 +146,20 @@ export function redrawCanvas() {
     ctx.restore();
   }
 
+  if (state.lastRestoreBox) {
+    ctx.save();
+    ctx.strokeStyle = "#22c55e";
+    ctx.setLineDash([12, 8]);
+    ctx.lineWidth = Math.max(2, Math.round(imageCanvas.width / 700));
+    ctx.strokeRect(
+      state.lastRestoreBox.xMin,
+      state.lastRestoreBox.yMin,
+      state.lastRestoreBox.width,
+      state.lastRestoreBox.height
+    );
+    ctx.restore();
+  }
+
   if (state.previewPoint) {
     ctx.save();
     ctx.fillStyle = "red";
@@ -155,6 +169,24 @@ export function redrawCanvas() {
     ctx.arc(
       state.previewPoint.x,
       state.previewPoint.y,
+      Math.max(4, Math.round(imageCanvas.width / 300)),
+      0,
+      2 * Math.PI
+    );
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  if (state.restorePreviewPoint) {
+    ctx.save();
+    ctx.fillStyle = "#22c55e";
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = Math.max(1, Math.round(imageCanvas.width / 1200));
+    ctx.beginPath();
+    ctx.arc(
+      state.restorePreviewPoint.x,
+      state.restorePreviewPoint.y,
       Math.max(4, Math.round(imageCanvas.width / 300)),
       0,
       2 * Math.PI
@@ -187,6 +219,7 @@ export async function loadXrayOnlyFromSource(xraySrc, xrayFileName) {
     state.hemdFileName = "";
     state.activeView = "xray";
     state.lastBox = null;
+    state.lastRestoreBox = null;
     state.currentDetectorBoxes = [];
     state.fftDetectorBoxes = [];
     state.suspectBoxes = [];
@@ -260,6 +293,7 @@ export async function loadImagePairFromSources(xraySrc, hemdSrc, xrayFileName, h
     state.hemdFileName = hemdFileName;
     state.activeView = "xray";
     state.lastBox = null;
+    state.lastRestoreBox = null;
     state.currentDetectorBoxes = [];
     state.fftDetectorBoxes = [];
     state.suspectBoxes = [];
@@ -290,11 +324,118 @@ export function loadImageFromSource(src, fileName) {
   loadImagePairFromSources(src, `./ImagensTest/${hemdName}`, fileName, hemdName);
 }
 
+
+function clampRegion(p1, p2) {
+  const xMin = Math.max(0, Math.min(p1.x, p2.x));
+  const xMax = Math.min(imageCanvas.width - 1, Math.max(p1.x, p2.x));
+  const yMin = Math.max(0, Math.min(p1.y, p2.y));
+  const yMax = Math.min(imageCanvas.height - 1, Math.max(p1.y, p2.y));
+
+  return {
+    xMin,
+    xMax,
+    yMin,
+    yMax,
+    width: xMax - xMin + 1,
+    height: yMax - yMin + 1
+  };
+}
+
+function subtractRegionFromBox(box, cut) {
+  const ix1 = Math.max(box.xMin, cut.xMin);
+  const iy1 = Math.max(box.yMin, cut.yMin);
+  const ix2 = Math.min(box.xMax, cut.xMax);
+  const iy2 = Math.min(box.yMax, cut.yMax);
+
+  // Não há interseção.
+  if (ix1 > ix2 || iy1 > iy2) {
+    return [{ ...box }];
+  }
+
+  const fragments = [];
+  const addFragment = (xMin, yMin, xMax, yMax) => {
+    if (xMin > xMax || yMin > yMax) return;
+    fragments.push({
+      ...box,
+      xMin,
+      yMin,
+      xMax,
+      yMax
+    });
+  };
+
+  // Faixa superior.
+  addFragment(box.xMin, box.yMin, box.xMax, iy1 - 1);
+
+  // Faixa inferior.
+  addFragment(box.xMin, iy2 + 1, box.xMax, box.yMax);
+
+  // Faixa esquerda na altura da interseção.
+  addFragment(box.xMin, iy1, ix1 - 1, iy2);
+
+  // Faixa direita na altura da interseção.
+  addFragment(ix2 + 1, iy1, box.xMax, iy2);
+
+  return fragments;
+}
+
+function subtractRegionFromBoxes(boxes, cut) {
+  return (boxes || []).flatMap((box) => subtractRegionFromBox(box, cut));
+}
+
+export function restoreBoundingBoxRegion(p1, p2) {
+  if (!state.currentImageData || !state.originalImageData) return;
+
+  const box = clampRegion(p1, p2);
+
+  if (box.width <= 1 || box.height <= 1) {
+    setStatus("Região de restauração inválida: selecione dois pontos diferentes.");
+    return;
+  }
+
+  const current = state.currentImageData.data;
+  const original = state.originalImageData.data;
+  const imageWidth = state.currentImageData.width;
+
+  for (let y = box.yMin; y <= box.yMax; y++) {
+    const start = (y * imageWidth + box.xMin) * 4;
+    const end = (y * imageWidth + box.xMax + 1) * 4;
+    current.set(original.subarray(start, end), start);
+  }
+
+  state.currentDetectorBoxes = subtractRegionFromBoxes(
+    state.currentDetectorBoxes,
+    box
+  );
+  state.fftDetectorBoxes = subtractRegionFromBoxes(
+    state.fftDetectorBoxes,
+    box
+  );
+  state.suspectBoxes = subtractRegionFromBoxes(
+    state.suspectBoxes,
+    box
+  );
+
+  state.lastBox = null;
+  state.lastRestoreBox = box;
+  resetRestoreSelection();
+  redrawCanvas();
+
+  const remaining = state.suspectBoxes.length;
+  setStatus(
+    `Região restaurada ao original. Os bounding boxes interceptados foram ` +
+    `recortados; restam ${remaining} região(ões) marcada(s).`
+  );
+}
+
 export function restoreOriginalImage() {
   if (!state.originalImageData) return;
 
   state.currentImageData = cloneImageData(state.originalImageData);
   state.lastBox = null;
+  state.lastRestoreBox = null;
+  state.currentDetectorBoxes = [];
+  state.fftDetectorBoxes = [];
   state.suspectBoxes = [];
   bboxInfoText.textContent = "nenhum";
 

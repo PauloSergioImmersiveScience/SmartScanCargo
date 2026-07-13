@@ -5,8 +5,18 @@ export function setStatus(message) {
   statusText.textContent = message;
 }
 
-export function resetSelection() {
+export function resetLeftSelection() {
   state.selectedPoints = [];
   state.previewPoint = null;
   pointsCountText.textContent = "0";
+}
+
+export function resetRestoreSelection() {
+  state.restorePoints = [];
+  state.restorePreviewPoint = null;
+}
+
+export function resetSelection() {
+  resetLeftSelection();
+  resetRestoreSelection();
 }
