@@ -21,8 +21,8 @@ import {
   btnShowXray
 } from "./scripts/dom.js?v=40";
 
-import { state } from "./scripts/state.js?v=50";
-import { setStatus, resetSelection, resetLeftSelection, resetRestoreSelection } from "./scripts/ui.js?v=50";
+import { state } from "./scripts/state.js";
+import { setStatus, resetSelection } from "./scripts/ui.js";
 import {
   getCanvasPoint,
   loadXrayOnlyFromSource,
@@ -33,7 +33,7 @@ import {
   downloadEqualizedImage,
   showImageView,
   updateViewButtons
-} from "./scripts/imagem.js?v=50";
+} from "./scripts/imagem.js?v=51";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
 import { findPossibleSuspectRegions } from "./scripts/detector.js?v=40";
 import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=40";
@@ -57,6 +57,24 @@ function expectedHemdIndex() {
 
 function setLocalDisplay(element, text) {
   element.textContent = text;
+}
+
+function ensureRestoreState() {
+  if (!Array.isArray(state.restorePoints)) state.restorePoints = [];
+  if (!("restorePreviewPoint" in state)) state.restorePreviewPoint = null;
+  if (!("lastRestoreBox" in state)) state.lastRestoreBox = null;
+}
+
+function resetLeftSelectionLocal() {
+  state.selectedPoints = [];
+  state.previewPoint = null;
+  pointsCountText.textContent = "0";
+}
+
+function resetRestoreSelectionLocal() {
+  ensureRestoreState();
+  state.restorePoints = [];
+  state.restorePreviewPoint = null;
 }
 
 function populateExampleSelect(select, type) {
@@ -178,6 +196,8 @@ btnLoadExampleHemd.addEventListener("click", async () => {
   await loadHemdOnlyFromSource(url, example.hemd);
 });
 
+ensureRestoreState();
+
 btnShowHemd.addEventListener("click", () => showImageView("hemd"));
 btnShowXray.addEventListener("click", () => showImageView("xray"));
 
@@ -186,7 +206,7 @@ imageCanvas.addEventListener("click", (event) => {
   const point = getCanvasPoint(event);
   if (!point || !state.currentImageData) return;
 
-  resetRestoreSelection();
+  resetRestoreSelectionLocal();
   state.lastRestoreBox = null;
   state.selectedPoints.push(point);
   pointsCountText.textContent = String(state.selectedPoints.length);
@@ -216,7 +236,7 @@ imageCanvas.addEventListener("contextmenu", (event) => {
   if (!point) return;
 
   // O botão direito trabalha com sua própria seleção de dois pontos.
-  resetLeftSelection();
+  resetLeftSelectionLocal();
   state.lastBox = null;
   state.restorePoints.push(point);
 
