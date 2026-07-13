@@ -3,19 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SmartSCargo - Equalização Local</title>
-  <link rel="stylesheet" href="style.css?v=20260713-60" />
+  <title>SmartScanCargo - Equalização Local</title>
+  <link rel="stylesheet" href="style.css?v=20260712-44" />
 </head>
 <body>
   <section id="loginScreen" class="login-screen">
     <div class="login-card">
-      <div class="brand brand-login">
-        <img src="assets/logo-smartscargo.jpeg" alt="SmartSCargo — Intelligent Vision for Logistics" />
-      </div>
+      <h1>SmartScanCargo</h1>
       <p>Equalização histogrâmica local em imagens de raio-X de contêineres.</p>
 
       <label for="passwordInput">Senha de acesso</label>
-      <input id="passwordInput" type="password" placeholder="Digite a senha" autocomplete="off" />
+      <input
+        id="passwordInput"
+        type="password"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        placeholder="Digite a senha numérica"
+        autocomplete="current-password"
+      />
 
       <button id="btnLogin" class="btn primary">Entrar</button>
       <p id="loginStatus" class="status error"></p>
@@ -25,9 +30,7 @@
   <main id="appScreen" class="container hidden">
     <header class="header">
       <div>
-        <div class="brand brand-header">
-          <img src="assets/logo-smartscargo.jpeg" alt="SmartSCargo — Intelligent Vision for Logistics" />
-        </div>
+        <h1>SmartScanCargo</h1>
         <p class="descricao">
           Clique em dois pontos para equalizar uma região livremente ou use a detecção automática para visualizar possíveis regiões suspeitas.
         </p>
