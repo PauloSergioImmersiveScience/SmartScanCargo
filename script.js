@@ -33,7 +33,7 @@ import {
   downloadEqualizedImage,
   showImageView,
   updateViewButtons
-} from "./scripts/imagem.js?v=52";
+} from "./scripts/imagem.js?v=53";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
 import { findPossibleSuspectRegions } from "./scripts/detector.js?v=40";
 import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=40";
