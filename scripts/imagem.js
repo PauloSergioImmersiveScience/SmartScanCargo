@@ -12,8 +12,21 @@ import {
   btnCloseHemdModal
 } from "./dom.js?v=40";
 import { state } from "./state.js";
-import { resetSelection, resetRestoreSelection, setStatus } from "./ui.js?v=50";
+import { resetSelection, setStatus } from "./ui.js";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
+
+
+function ensureRestoreState() {
+  if (!Array.isArray(state.restorePoints)) state.restorePoints = [];
+  if (!("restorePreviewPoint" in state)) state.restorePreviewPoint = null;
+  if (!("lastRestoreBox" in state)) state.lastRestoreBox = null;
+}
+
+function resetRestoreSelectionLocal() {
+  ensureRestoreState();
+  state.restorePoints = [];
+  state.restorePreviewPoint = null;
+}
 
 function cloneImageData(imageData) {
   return new ImageData(
@@ -116,6 +129,7 @@ export function showImageView(view) {
 }
 
 export function redrawCanvas() {
+  ensureRestoreState();
   if (!state.currentImageData) return;
 
   ctx.putImageData(state.currentImageData, 0, 0);
@@ -380,7 +394,32 @@ function subtractRegionFromBox(box, cut) {
 }
 
 function subtractRegionFromBoxes(boxes, cut) {
-  return (boxes || []).flatMap((box) => subtractRegionFromBox(box, cut));
+  return (boxes || []).flatMap((box) => {
+    const fragments = subtractRegionFromBox(box, cut);
+
+    if (fragments.length <= 1) {
+      return fragments;
+    }
+
+    let largest = fragments[0];
+    let largestArea =
+      (largest.xMax - largest.xMin + 1) *
+      (largest.yMax - largest.yMin + 1);
+
+    for (let i = 1; i < fragments.length; i++) {
+      const fragment = fragments[i];
+      const area =
+        (fragment.xMax - fragment.xMin + 1) *
+        (fragment.yMax - fragment.yMin + 1);
+
+      if (area > largestArea) {
+        largest = fragment;
+        largestArea = area;
+      }
+    }
+
+    return [largest];
+  });
 }
 
 export function restoreBoundingBoxRegion(p1, p2) {
@@ -418,7 +457,7 @@ export function restoreBoundingBoxRegion(p1, p2) {
 
   state.lastBox = null;
   state.lastRestoreBox = box;
-  resetRestoreSelection();
+  resetRestoreSelectionLocal();
   redrawCanvas();
 
   const remaining = state.suspectBoxes.length;
