@@ -24,7 +24,7 @@ import {
 } from "./scripts/dom.js?v=62";
 
 import { state } from "./scripts/state.js";
-import { initializeEffectsUI } from "./scripts/effects.js?v=62";
+import { initializeEffectsUI, resetEffectsRanges } from "./scripts/effects.js?v=62";
 import { setStatus, resetSelection } from "./scripts/ui.js";
 import {
   getCanvasPoint,
@@ -36,7 +36,7 @@ import {
   downloadEqualizedImage,
   showImageView,
   updateViewButtons
-} from "./scripts/imagem.js?v=54";
+} from "./scripts/imagem.js?v=63";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
 import { findPossibleSuspectRegions } from "./scripts/detector.js?v=40";
 import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=40";
@@ -260,7 +260,17 @@ imageCanvas.addEventListener("contextmenu", (event) => {
   restoreBoundingBoxRegion(p1, p2);
 });
 
-btnRestore.addEventListener("click", restoreOriginalImage);
+btnRestore.addEventListener("click", () => {
+  if (state.activeView === "effects") {
+    // Em Effects, restaura apenas os ranges de intensidade da terceira imagem.
+    // A X-RAY e a HEMD permanecem exatamente como estão.
+    resetEffectsRanges();
+    setStatus("Effects restaurado aos ranges iniciais de intensidade.");
+    return;
+  }
+
+  restoreOriginalImage();
+});
 
 btnSuspect.addEventListener("click", async () => {
   if (state.activeView !== "xray") return;
