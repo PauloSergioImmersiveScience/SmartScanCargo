@@ -13,6 +13,11 @@ import {
   btnLoadExampleXray,
   btnLoadExampleHemd,
   imageCanvas,
+  hemdCanvas,
+  effectsCanvas,
+  effectsPanel,
+  imageNameText,
+  bboxInfoText,
   pointsCountText,
   btnRestore,
   btnDownload,
@@ -48,7 +53,75 @@ btnLogin.addEventListener("click", checkPassword);
 passwordInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") checkPassword();
 });
-btnLogout.addEventListener("click", lockApp);
+function resetApplicationSession() {
+  // Limpa somente o estado da sessão atual. A configuração salva dos
+  // algoritmos permanece intacta, pois nenhum dado de localStorage é alterado.
+  state.originalImageData = null;
+  state.currentImageData = null;
+  state.hemdImageData = null;
+  state.effectsImageData = null;
+  state.effectsThresholds = [1, 10, 20, 30, 40];
+  state.activeView = "xray";
+  state.selectedPoints = [];
+  state.previewPoint = null;
+  state.restorePoints = [];
+  state.restorePreviewPoint = null;
+  state.lastRestoreBox = null;
+  state.lastBox = null;
+  state.currentDetectorBoxes = [];
+  state.fftDetectorBoxes = [];
+  state.suspectBoxes = [];
+  state.currentFileName = "";
+  state.hemdFileName = "";
+
+  imageLoader.value = "";
+  hemdLoader.value = "";
+  exampleXraySelect.value = "";
+  exampleHemdSelect.value = "";
+  btnLoadExampleXray.disabled = true;
+  btnLoadExampleHemd.disabled = true;
+
+  setLocalDisplay(localXrayDisplay, "Selecione uma imagem X-RAY");
+  setLocalDisplay(localHemdDisplay, "Selecione uma imagem HEMD correspondente");
+
+  imageCanvas.getContext("2d").clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+  hemdCanvas.getContext("2d").clearRect(0, 0, hemdCanvas.width, hemdCanvas.height);
+  effectsCanvas.getContext("2d").clearRect(0, 0, effectsCanvas.width, effectsCanvas.height);
+
+  imageCanvas.width = 0;
+  imageCanvas.height = 0;
+  hemdCanvas.width = 0;
+  hemdCanvas.height = 0;
+  effectsCanvas.width = 0;
+  effectsCanvas.height = 0;
+
+  imageCanvas.classList.add("canvas-visible");
+  hemdCanvas.classList.remove("canvas-visible");
+  effectsCanvas.classList.remove("canvas-visible");
+  imageCanvas.setAttribute("aria-hidden", "false");
+  hemdCanvas.setAttribute("aria-hidden", "true");
+  effectsCanvas.setAttribute("aria-hidden", "true");
+  effectsPanel.hidden = true;
+
+  imageNameText.textContent = "nenhuma imagem carregada";
+  pointsCountText.textContent = "0";
+  bboxInfoText.textContent = "nenhum";
+
+  resetEffectsRanges();
+  updateViewButtons();
+  setStatus("");
+}
+
+btnLogout.addEventListener("click", () => {
+  // Primeiro encerra a sessão e retorna imediatamente à tela de login.
+  lockApp();
+
+  // Em seguida, com a aplicação já oculta, limpa apenas o estado de trabalho.
+  // Assim, ao entrar novamente, o sistema começa sem imagens, seleções,
+  // bounding boxes ou resultados, mas preserva integralmente a configuração
+  // dos algoritmos salva no localStorage.
+  resetApplicationSession();
+});
 
 function extractIndex(fileName, prefix) {
   const match = fileName.match(new RegExp(`^${prefix}(\\d+)\\.[^.]+$`, "i"));
