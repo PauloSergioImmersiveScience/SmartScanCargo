@@ -222,7 +222,8 @@ function xToIntensity(x, width) {
 }
 
 function drawRangeBar() {
-  updateRangeSummary();
+  const oldSummary = document.getElementById("effectsRangeSummary");
+  if (oldSummary) oldSummary.remove();
 
   const { context, width, height } = prepareCanvas(effectsRangeCanvas, RANGE_HEIGHT);
   context.clearRect(0, 0, width, height);
@@ -230,12 +231,44 @@ function drawRangeBar() {
   const barTop = 0;
   const barBottom = height - 1;
 
-  for (const [start, end, color] of getRanges()) {
+  const labels = getCurrentRangeLabels();
+  const ranges = [
+    [0, state.effectsThresholds[0] - 1, COLORS.black, labels.blackStart],
+    [state.effectsThresholds[0], state.effectsThresholds[1], COLORS.orange, labels.orange],
+    [state.effectsThresholds[1] + 1, state.effectsThresholds[2], COLORS.green, labels.green],
+    [state.effectsThresholds[2] + 1, state.effectsThresholds[3], COLORS.blue, labels.blue],
+    [state.effectsThresholds[3] + 1, state.effectsThresholds[4], COLORS.pink, labels.pink],
+    [state.effectsThresholds[4] + 1, 255, COLORS.black, labels.blackEnd]
+  ];
+
+  for (const [start, end, color, text] of ranges) {
     if (start > end) continue;
+
     const x0 = intensityToX(start, width);
     const x1 = intensityToX(end + 1, width);
+    const segmentWidth = Math.max(1, x1 - x0);
+
     context.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-    context.fillRect(x0, barTop, Math.max(1, x1 - x0), barBottom - barTop);
+    context.fillRect(x0, barTop, segmentWidth, barBottom - barTop);
+
+    // Escreve o range dentro da própria faixa, sempre centralizado.
+    // O tamanho da fonte diminui automaticamente quando a faixa fica estreita.
+    const centerX = x0 + segmentWidth / 2;
+    const centerY = (barTop + barBottom) / 2;
+    const fontSize = Math.max(7, Math.min(12, segmentWidth / Math.max(2.5, text.length * 0.62)));
+
+    context.save();
+    context.beginPath();
+    context.rect(x0 + 2, barTop + 1, Math.max(0, segmentWidth - 4), Math.max(0, barBottom - barTop - 2));
+    context.clip();
+    context.font = `700 ${fontSize}px Arial, sans-serif`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+
+    const luminance = 0.299 * color[0] + 0.587 * color[1] + 0.114 * color[2];
+    context.fillStyle = luminance < 105 ? "#ffffff" : "#111111";
+    context.fillText(text, centerX, centerY);
+    context.restore();
   }
 
   context.strokeStyle = "#222";
