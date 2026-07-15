@@ -75,14 +75,18 @@ export function initializeEffectsCanvas(width, height) {
 }
 
 export function updateEffectsImage() {
-  if (!state.effectsSourceImageData || !effectsCanvas.width || !effectsCanvas.height) return;
+  if (!state.effectsSourcePixels || !state.effectsSourceWidth || !state.effectsSourceHeight) return;
 
-  // Effects possui uma fonte independente: sempre parte de uma cópia exclusiva da X-RAY original.
-  // Equalização local, bounding boxes e demais alterações em currentImageData
-  // não podem modificar esta visualização.
-  const source = state.effectsSourceImageData;
-  const output = new ImageData(source.width, source.height);
-  const src = source.data;
+  // Usa apenas o buffer bruto capturado no carregamento. Esse array não é
+  // compartilhado com nenhum canvas nem com currentImageData.
+  const width = state.effectsSourceWidth;
+  const height = state.effectsSourceHeight;
+  if (effectsCanvas.width !== width || effectsCanvas.height !== height) {
+    effectsCanvas.width = width;
+    effectsCanvas.height = height;
+  }
+  const output = new ImageData(width, height);
+  const src = state.effectsSourcePixels;
   const dst = output.data;
 
   for (let i = 0; i < src.length; i += 4) {
@@ -162,10 +166,8 @@ function drawRangeBar() {
 
 function calculateHistogram() {
   const histogram = new Uint32Array(256);
-  if (!state.effectsSourceImageData) return histogram;
-  // O histograma de Effects também é calculado exclusivamente sobre
-  // a cópia exclusiva da imagem X-RAY original, mantendo as janelas totalmente isoladas.
-  const data = state.effectsSourceImageData.data;
+  if (!state.effectsSourcePixels) return histogram;
+  const data = state.effectsSourcePixels;
   for (let i = 0; i < data.length; i += 4) histogram[grayAt(data, i)]++;
   return histogram;
 }
@@ -203,7 +205,7 @@ function drawHistogram() {
 }
 
 export function drawEffectsControls() {
-  if (effectsPanel.hidden || !state.effectsSourceImageData) return;
+  if (effectsPanel.hidden || !state.effectsSourcePixels) return;
   drawRangeBar();
   drawHistogram();
 }

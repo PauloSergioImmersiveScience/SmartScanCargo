@@ -18,7 +18,7 @@ import {
 import { state } from "./state.js";
 import { resetSelection, setStatus } from "./ui.js";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
-import { initializeEffectsCanvas, updateEffectsImage, drawEffectsControls } from "./effects.js?v=65";
+import { initializeEffectsCanvas, updateEffectsImage, drawEffectsControls } from "./effects.js?v=66";
 
 
 function ensureRestoreState() {
@@ -38,6 +38,27 @@ function cloneImageData(imageData) {
     new Uint8ClampedArray(imageData.data),
     imageData.width,
     imageData.height
+  );
+}
+
+function createIndependentEffectsSource(htmlImage, width, height) {
+  // O Effects é capturado em um canvas temporário exclusivo.
+  // Ele nunca é derivado do canvas X-RAY, que recebe pontos, bounding boxes
+  // e equalizações locais.
+  const sourceCanvas = document.createElement("canvas");
+  sourceCanvas.width = width;
+  sourceCanvas.height = height;
+  const sourceCtx = sourceCanvas.getContext("2d", { willReadFrequently: true });
+  sourceCtx.drawImage(htmlImage, 0, 0, width, height);
+  const sourceImageData = sourceCtx.getImageData(0, 0, width, height);
+
+  state.effectsSourceWidth = width;
+  state.effectsSourceHeight = height;
+  state.effectsSourcePixels = new Uint8ClampedArray(sourceImageData.data);
+  state.effectsSourceImageData = new ImageData(
+    new Uint8ClampedArray(state.effectsSourcePixels),
+    width,
+    height
   );
 }
 
@@ -163,7 +184,6 @@ export function redrawCanvas() {
   ctx.lineDashOffset = 0;
   ctx.globalAlpha = 1;
   ctx.putImageData(state.currentImageData, 0, 0);
-  updateEffectsImage();
 
   if (state.suspectBoxes?.length > 0) {
     ctx.save();
@@ -247,9 +267,7 @@ export async function loadXrayOnlyFromSource(xraySrc, xrayFileName) {
     hemdCtx.clearRect(0, 0, width, height);
 
     state.originalImageData = ctx.getImageData(0, 0, width, height);
-    // Cópia imutável e exclusiva da tela Effects. Nenhuma rotina da X-RAY
-    // recebe referência para este buffer.
-    state.effectsSourceImageData = cloneImageData(state.originalImageData);
+    createIndependentEffectsSource(xrayImg, width, height);
     state.currentImageData = cloneImageData(state.originalImageData);
     state.hemdImageData = null;
     state.currentFileName = xrayFileName;
@@ -325,9 +343,7 @@ export async function loadImagePairFromSources(xraySrc, hemdSrc, xrayFileName, h
     hemdCtx.drawImage(hemdImg, 0, 0, width, height);
 
     state.originalImageData = ctx.getImageData(0, 0, width, height);
-    // Cópia imutável e exclusiva da tela Effects. Nenhuma rotina da X-RAY
-    // recebe referência para este buffer.
-    state.effectsSourceImageData = cloneImageData(state.originalImageData);
+    createIndependentEffectsSource(xrayImg, width, height);
     state.currentImageData = cloneImageData(state.originalImageData);
     state.hemdImageData = hemdCtx.getImageData(0, 0, width, height);
     state.currentFileName = xrayFileName;

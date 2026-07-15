@@ -1,6 +1,9 @@
 export const state = {
   originalImageData: null,
   effectsSourceImageData: null,
+  effectsSourcePixels: null,
+  effectsSourceWidth: 0,
+  effectsSourceHeight: 0,
   currentImageData: null,
   selectedPoints: [],
   previewPoint: null,
