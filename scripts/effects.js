@@ -74,36 +74,63 @@ function ensureRangeSummaryElement() {
   if (!element) {
     element = document.createElement("div");
     element.id = "effectsRangeSummary";
+    element.style.position = "relative";
     element.style.display = "block";
     element.style.width = "100%";
+    element.style.height = "20px";
     element.style.boxSizing = "border-box";
-    element.style.padding = "2px 4px";
     element.style.margin = "0";
     element.style.background = "#ffffff";
     element.style.color = "#111111";
-    element.style.font = "600 12px Arial, sans-serif";
-    element.style.lineHeight = "16px";
+    element.style.font = "600 11px Arial, sans-serif";
+    element.style.lineHeight = "20px";
     element.style.whiteSpace = "nowrap";
-    element.style.overflow = "hidden";
-    element.style.textOverflow = "ellipsis";
+    element.style.overflow = "visible";
     effectsRangeCanvas.parentNode.insertBefore(element, effectsRangeCanvas);
   }
   return element;
 }
 
 function updateRangeSummary() {
-  const labels = getCurrentRangeLabels();
-  const summary = [
-    labels.blackStart,
-    labels.orange,
-    labels.green,
-    labels.blue,
-    labels.pink,
-    labels.blackEnd
-  ].join("   ");
+  ensureEffectsState();
 
   const element = ensureRangeSummaryElement();
-  element.textContent = summary;
+  const width = effectsRangeCanvas.getBoundingClientRect().width
+    || effectsPanel.clientWidth
+    || 800;
+  const usableWidth = Math.max(1, width - 2 * MARGIN);
+
+  const labels = getCurrentRangeLabels();
+  const [orangeStart, orangeEnd, greenEnd, blueEnd, pinkEnd] = state.effectsThresholds;
+  const ranges = [
+    [0, orangeStart - 1, labels.blackStart],
+    [orangeStart, orangeEnd, labels.orange],
+    [orangeEnd + 1, greenEnd, labels.green],
+    [greenEnd + 1, blueEnd, labels.blue],
+    [blueEnd + 1, pinkEnd, labels.pink],
+    [pinkEnd + 1, 255, labels.blackEnd]
+  ];
+
+  element.replaceChildren();
+
+  for (const [start, end, text] of ranges) {
+    if (start > end) continue;
+
+    const centerIntensity = (start + end + 1) / 2;
+    const centerX = MARGIN + (centerIntensity / 256) * usableWidth;
+
+    const label = document.createElement("span");
+    label.textContent = text;
+    label.style.position = "absolute";
+    label.style.left = `${centerX}px`;
+    label.style.top = "0";
+    label.style.transform = "translateX(-50%)";
+    label.style.textAlign = "center";
+    label.style.color = "#111111";
+    label.style.pointerEvents = "none";
+
+    element.appendChild(label);
+  }
 }
 
 function grayAt(data, index) {
