@@ -70,8 +70,10 @@ export function updateViewButtons() {
   const showingXray = state.activeView === "xray";
   const showingEffects = state.activeView === "effects";
 
-  // Preserva o comportamento original dos botões HEMD e X-RAY.
-  btnShowHemd.disabled = !hasXray || !showingXray;
+  // HEMD pode ser acessada tanto a partir da X-RAY quanto de Effects.
+  // O botão fica desabilitado apenas sem uma X-RAY carregada ou quando
+  // a própria visualização HEMD já está ativa.
+  btnShowHemd.disabled = !hasXray || state.activeView === "hemd";
   btnShowXray.disabled = !hasXray || showingXray;
 
   // Effects fica disponível após o carregamento da X-RAY.
