@@ -68,12 +68,13 @@ export function getCanvasPoint(event) {
 export function updateViewButtons() {
   const hasXray = Boolean(state.currentImageData);
   const showingXray = state.activeView === "xray";
-  const showingHemd = state.activeView === "hemd";
   const showingEffects = state.activeView === "effects";
 
-  // Cada botão fica desativado apenas quando sua própria visualização já está ativa.
-  btnShowHemd.disabled = !hasXray || showingHemd;
+  // Preserva o comportamento original dos botões HEMD e X-RAY.
+  btnShowHemd.disabled = !hasXray || !showingXray;
   btnShowXray.disabled = !hasXray || showingXray;
+
+  // Effects fica disponível após o carregamento da X-RAY.
   btnEffects.disabled = !hasXray || showingEffects;
   btnSuspect.disabled = !hasXray || !showingXray;
 
