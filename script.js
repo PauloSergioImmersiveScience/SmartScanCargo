@@ -29,7 +29,7 @@ import {
 } from "./scripts/dom.js?v=62";
 
 import { state } from "./scripts/state.js";
-import { initializeEffectsUI, resetEffectsRanges } from "./scripts/effects.js?v=66";
+import { initializeEffectsUI, resetEffectsRanges } from "./scripts/effects.js?v=70";
 import { setStatus, resetSelection } from "./scripts/ui.js";
 import {
   getCanvasPoint,
@@ -41,7 +41,7 @@ import {
   downloadEqualizedImage,
   showImageView,
   updateViewButtons
-} from "./scripts/imagem.js?v=66";
+} from "./scripts/imagem.js?v=65";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
 import { findPossibleSuspectRegions } from "./scripts/detector.js?v=40";
 import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=40";
@@ -58,9 +58,6 @@ function resetApplicationSession() {
   // algoritmos permanece intacta, pois nenhum dado de localStorage é alterado.
   state.originalImageData = null;
   state.effectsSourceImageData = null;
-  state.effectsSourcePixels = null;
-  state.effectsSourceWidth = 0;
-  state.effectsSourceHeight = 0;
   state.currentImageData = null;
   state.hemdImageData = null;
   state.effectsImageData = null;
