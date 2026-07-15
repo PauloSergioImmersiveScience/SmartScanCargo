@@ -3,8 +3,9 @@ import {
   effectsCtx,
   effectsPanel,
   effectsRangeCanvas,
-  effectsHistogramCanvas
-} from "./dom.js?v=62";
+  effectsHistogramCanvas,
+  hemdPaletteCanvas
+} from "./dom.js?v=63";
 import { state } from "./state.js";
 
 const INITIAL_THRESHOLDS = [1, 10, 20, 30, 40];
@@ -302,19 +303,20 @@ function calculateHistogram() {
 }
 
 
-function drawPaletteLegend() {
-  if (!effectsPaletteCanvas) return;
+function drawPaletteLegend(targetCanvas, useCurrentThresholds = true) {
+  if (!targetCanvas) return;
 
   const ratio = window.devicePixelRatio || 1;
-  const width = canvasWidth();
+  const panelWidth = targetCanvas.parentElement?.clientWidth || 0;
+  const width = Math.max(260, Math.round(panelWidth || canvasWidth()));
   const height = PALETTE_HEIGHT;
 
-  effectsPaletteCanvas.width = Math.round(width * ratio);
-  effectsPaletteCanvas.height = Math.round(height * ratio);
-  effectsPaletteCanvas.style.width = `${width}px`;
-  effectsPaletteCanvas.style.height = `${height}px`;
+  targetCanvas.width = Math.round(width * ratio);
+  targetCanvas.height = Math.round(height * ratio);
+  targetCanvas.style.width = `${width}px`;
+  targetCanvas.style.height = `${height}px`;
 
-  const ctx = effectsPaletteCanvas.getContext("2d");
+  const ctx = targetCanvas.getContext("2d");
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "#ffffff";
@@ -379,7 +381,9 @@ function drawPaletteLegend() {
   const bracketY = 178;
   const labelY = 192;
   const rangeY = 220;
-  const currentLabels = getCurrentRangeLabels();
+  const currentLabels = useCurrentThresholds
+    ? getCurrentRangeLabels()
+    : { blackStart: "0", blackEnd: "41-255", orange: "1-10", green: "11-20", blue: "21-30", pink: "31-40" };
   const categories = [
     { x0: left, x1: blackEnd, color: "#111111", label: "Black", range: `${currentLabels.blackStart} / ${currentLabels.blackEnd}` },
     { x0: xForIndex(2.8), x1: xForIndex(10), color: "#f57c00", label: "Organic", range: currentLabels.orange },
@@ -449,7 +453,11 @@ export function drawEffectsControls() {
   if (effectsPanel.hidden || !state.effectsSourcePixels) return;
   drawRangeBar();
   drawHistogram();
-  drawPaletteLegend();
+  drawPaletteLegend(effectsPaletteCanvas, true);
+}
+
+export function drawHemdPalette() {
+  drawPaletteLegend(hemdPaletteCanvas, false);
 }
 
 function constrainThreshold(index, value) {

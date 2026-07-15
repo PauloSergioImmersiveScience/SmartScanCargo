@@ -3,6 +3,7 @@ import {
   hemdCanvas,
   effectsCanvas,
   effectsPanel,
+  hemdPalettePanel,
   ctx,
   hemdCtx,
   imageNameText,
@@ -14,11 +15,11 @@ import {
   btnReport,
   hemdMissingModal,
   btnCloseHemdModal
-} from "./dom.js?v=62";
+} from "./dom.js?v=63";
 import { state } from "./state.js";
 import { resetSelection, setStatus } from "./ui.js";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
-import { initializeEffectsCanvas, updateEffectsImage, drawEffectsControls } from "./effects.js?v=66";
+import { initializeEffectsCanvas, updateEffectsImage, drawEffectsControls, drawHemdPalette } from "./effects.js?v=71";
 
 
 function ensureRestoreState() {
@@ -153,10 +154,13 @@ export function showImageView(view) {
   hemdCanvas.setAttribute("aria-hidden", String(!showingHemd));
   effectsCanvas.setAttribute("aria-hidden", String(!showingEffects));
   effectsPanel.hidden = !showingEffects;
+  hemdPalettePanel.hidden = !showingHemd;
 
   if (showingEffects) {
     updateEffectsImage();
     requestAnimationFrame(drawEffectsControls);
+  } else if (showingHemd) {
+    requestAnimationFrame(drawHemdPalette);
   }
 
   resetSelection();
