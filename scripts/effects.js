@@ -9,7 +9,7 @@ import { state } from "./state.js";
 
 const INITIAL_THRESHOLDS = [1, 10, 20, 30, 40];
 const MIN_CLASS_WIDTH = 1;
-const RANGE_HEIGHT = 54;
+const RANGE_HEIGHT = 72;
 const HISTOGRAM_HEIGHT = 130;
 const MARGIN = 2;
 const HIT_RADIUS = 12;
@@ -49,6 +49,23 @@ function getRanges() {
     [blueEnd + 1, pinkEnd, COLORS.pink],
     [pinkEnd + 1, 255, COLORS.black]
   ];
+}
+
+
+function getCurrentRangeLabels() {
+  ensureEffectsState();
+  const [orangeStart, orangeEnd, greenEnd, blueEnd, pinkEnd] = state.effectsThresholds;
+
+  const formatRange = (start, end) => start === end ? String(start) : `${start}-${end}`;
+
+  return {
+    blackStart: formatRange(0, orangeStart - 1),
+    orange: formatRange(orangeStart, orangeEnd),
+    green: formatRange(orangeEnd + 1, greenEnd),
+    blue: formatRange(greenEnd + 1, blueEnd),
+    pink: formatRange(blueEnd + 1, pinkEnd),
+    blackEnd: formatRange(pinkEnd + 1, 255)
+  };
 }
 
 function grayAt(data, index) {
@@ -138,31 +155,50 @@ function drawRangeBar() {
   const { context, width, height } = prepareCanvas(effectsRangeCanvas, RANGE_HEIGHT);
   context.clearRect(0, 0, width, height);
 
+  const labels = getCurrentRangeLabels();
+  const summary = [
+    labels.blackStart,
+    labels.orange,
+    labels.green,
+    labels.blue,
+    labels.pink,
+    labels.blackEnd
+  ].join("   ");
+
+  context.fillStyle = "#1f1f1f";
+  context.font = "600 12px Arial, sans-serif";
+  context.textAlign = "left";
+  context.textBaseline = "top";
+  context.fillText(summary, MARGIN, 1);
+
+  const barTop = 18;
+  const barBottom = height - 1;
+
   for (const [start, end, color] of getRanges()) {
     if (start > end) continue;
     const x0 = intensityToX(start, width);
     const x1 = intensityToX(end + 1, width);
     context.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-    context.fillRect(x0, 1, Math.max(1, x1 - x0), height - 2);
+    context.fillRect(x0, barTop, Math.max(1, x1 - x0), barBottom - barTop);
   }
 
   context.strokeStyle = "#222";
   context.lineWidth = 1;
-  context.strokeRect(MARGIN, 1, width - 2 * MARGIN, height - 2);
+  context.strokeRect(MARGIN, barTop, width - 2 * MARGIN, barBottom - barTop);
 
   for (const threshold of state.effectsThresholds) {
     const x = intensityToX(threshold, width);
     context.strokeStyle = "#fff";
     context.lineWidth = 3;
     context.beginPath();
-    context.moveTo(x, 0);
-    context.lineTo(x, height);
+    context.moveTo(x, barTop);
+    context.lineTo(x, barBottom);
     context.stroke();
     context.strokeStyle = "#111";
     context.lineWidth = 1;
     context.beginPath();
-    context.moveTo(x + 2, 0);
-    context.lineTo(x + 2, height);
+    context.moveTo(x + 2, barTop);
+    context.lineTo(x + 2, barBottom);
     context.stroke();
   }
 }
@@ -253,12 +289,13 @@ function drawPaletteLegend() {
   const bracketY = 178;
   const labelY = 192;
   const rangeY = 220;
+  const currentLabels = getCurrentRangeLabels();
   const categories = [
-    { x0: left, x1: blackEnd, color: "#111111", label: "Black", range: "sem sinal" },
-    { x0: xForIndex(2.8), x1: xForIndex(10), color: "#f57c00", label: "Organic", range: "1–10" },
-    { x0: xForIndex(11.2), x1: xForIndex(20), color: "#0aa63b", label: "Intermediate", range: "11–20" },
-    { x0: xForIndex(21.0), x1: xForIndex(30), color: "#123fcd", label: "Mineral", range: "21–30" },
-    { x0: xForIndex(31.0), x1: xForIndex(40), color: "#e50046", label: "High Z", range: "31–40" }
+    { x0: left, x1: blackEnd, color: "#111111", label: "Black", range: `${currentLabels.blackStart} / ${currentLabels.blackEnd}` },
+    { x0: xForIndex(2.8), x1: xForIndex(10), color: "#f57c00", label: "Organic", range: currentLabels.orange },
+    { x0: xForIndex(11.2), x1: xForIndex(20), color: "#0aa63b", label: "Intermediate", range: currentLabels.green },
+    { x0: xForIndex(21.0), x1: xForIndex(30), color: "#123fcd", label: "Mineral", range: currentLabels.blue },
+    { x0: xForIndex(31.0), x1: xForIndex(40), color: "#e50046", label: "High Z", range: currentLabels.pink }
   ];
 
   for (const category of categories) {
