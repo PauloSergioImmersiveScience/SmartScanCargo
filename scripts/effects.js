@@ -165,7 +165,12 @@ function drawRangeBar() {
     labels.blackEnd
   ].join("   ");
 
-  context.fillStyle = "#1f1f1f";
+  // Faixa clara exclusiva para os intervalos atuais.
+  // Isso evita texto escuro sobre o fundo preto do canvas.
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, width, 18);
+
+  context.fillStyle = "#111111";
   context.font = "600 12px Arial, sans-serif";
   context.textAlign = "left";
   context.textBaseline = "top";
