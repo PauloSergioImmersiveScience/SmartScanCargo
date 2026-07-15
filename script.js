@@ -29,7 +29,7 @@ import {
 } from "./scripts/dom.js?v=62";
 
 import { state } from "./scripts/state.js";
-import { initializeEffectsUI, resetEffectsRanges } from "./scripts/effects.js?v=62";
+import { initializeEffectsUI, resetEffectsRanges } from "./scripts/effects.js?v=64";
 import { setStatus, resetSelection } from "./scripts/ui.js";
 import {
   getCanvasPoint,
@@ -41,7 +41,7 @@ import {
   downloadEqualizedImage,
   showImageView,
   updateViewButtons
-} from "./scripts/imagem.js?v=63";
+} from "./scripts/imagem.js?v=64";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
 import { findPossibleSuspectRegions } from "./scripts/detector.js?v=40";
 import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=40";
