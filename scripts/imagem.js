@@ -18,7 +18,7 @@ import {
 import { state } from "./state.js";
 import { resetSelection, setStatus } from "./ui.js";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
-import { initializeEffectsCanvas, updateEffectsImage, drawEffectsControls } from "./effects.js?v=62";
+import { initializeEffectsCanvas, updateEffectsImage, drawEffectsControls, resetEffectsRanges } from "./effects.js?v=62";
 
 
 function ensureRestoreState() {
@@ -258,6 +258,11 @@ export async function loadXrayOnlyFromSource(xraySrc, xrayFileName) {
     state.fftDetectorBoxes = [];
     state.suspectBoxes = [];
 
+    // Toda nova X-RAY inicia na visualização original e restaura somente
+    // os ranges do Effects para os valores-padrão. As configurações gerais
+    // do sistema permanecem inalteradas.
+    resetEffectsRanges();
+
     bboxInfoText.textContent = "nenhum";
     resetSelection();
     redrawCanvas();
@@ -332,6 +337,11 @@ export async function loadImagePairFromSources(xraySrc, hemdSrc, xrayFileName, h
     state.currentDetectorBoxes = [];
     state.fftDetectorBoxes = [];
     state.suspectBoxes = [];
+
+    // Toda nova X-RAY inicia na visualização original e restaura somente
+    // os ranges do Effects para os valores-padrão. As configurações gerais
+    // do sistema permanecem inalteradas.
+    resetEffectsRanges();
 
     bboxInfoText.textContent = "nenhum";
     resetSelection();
