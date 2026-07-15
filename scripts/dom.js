@@ -17,8 +17,13 @@ export const btnLoadExampleHemd = document.getElementById("btnLoadExampleHemd");
 
 export const imageCanvas = document.getElementById("imageCanvas");
 export const hemdCanvas = document.getElementById("hemdCanvas");
+export const effectsCanvas = document.getElementById("effectsCanvas");
 export const ctx = imageCanvas.getContext("2d");
 export const hemdCtx = hemdCanvas.getContext("2d");
+export const effectsCtx = effectsCanvas.getContext("2d");
+export const effectsPanel = document.getElementById("effectsPanel");
+export const effectsRangeCanvas = document.getElementById("effectsRangeCanvas");
+export const effectsHistogramCanvas = document.getElementById("effectsHistogramCanvas");
 
 export const imageNameText = document.getElementById("imageName");
 export const pointsCountText = document.getElementById("pointsCount");
@@ -29,6 +34,7 @@ export const btnDownload = document.getElementById("btnDownload");
 export const btnSuspect = document.getElementById("btnSuspect");
 export const btnShowHemd = document.getElementById("btnShowHemd");
 export const btnShowXray = document.getElementById("btnShowXray");
+export const btnEffects = document.getElementById("btnEffects");
 export const btnReport = document.getElementById("btnReport");
 
 export const hemdMissingModal = document.getElementById("hemdMissingModal");
