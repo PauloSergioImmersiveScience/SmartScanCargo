@@ -9,7 +9,7 @@ import { state } from "./state.js";
 
 const INITIAL_THRESHOLDS = [1, 10, 20, 30, 40];
 const MIN_CLASS_WIDTH = 1;
-const RANGE_HEIGHT = 72;
+const RANGE_HEIGHT = 55;
 const HISTOGRAM_HEIGHT = 130;
 const MARGIN = 2;
 const HIT_RADIUS = 12;
@@ -66,6 +66,44 @@ function getCurrentRangeLabels() {
     pink: formatRange(blueEnd + 1, pinkEnd),
     blackEnd: formatRange(pinkEnd + 1, 255)
   };
+}
+
+
+function ensureRangeSummaryElement() {
+  let element = document.getElementById("effectsRangeSummary");
+  if (!element) {
+    element = document.createElement("div");
+    element.id = "effectsRangeSummary";
+    element.style.display = "block";
+    element.style.width = "100%";
+    element.style.boxSizing = "border-box";
+    element.style.padding = "2px 4px";
+    element.style.margin = "0";
+    element.style.background = "#ffffff";
+    element.style.color = "#111111";
+    element.style.font = "600 12px Arial, sans-serif";
+    element.style.lineHeight = "16px";
+    element.style.whiteSpace = "nowrap";
+    element.style.overflow = "hidden";
+    element.style.textOverflow = "ellipsis";
+    effectsRangeCanvas.parentNode.insertBefore(element, effectsRangeCanvas);
+  }
+  return element;
+}
+
+function updateRangeSummary() {
+  const labels = getCurrentRangeLabels();
+  const summary = [
+    labels.blackStart,
+    labels.orange,
+    labels.green,
+    labels.blue,
+    labels.pink,
+    labels.blackEnd
+  ].join("   ");
+
+  const element = ensureRangeSummaryElement();
+  element.textContent = summary;
 }
 
 function grayAt(data, index) {
@@ -152,31 +190,12 @@ function xToIntensity(x, width) {
 }
 
 function drawRangeBar() {
+  updateRangeSummary();
+
   const { context, width, height } = prepareCanvas(effectsRangeCanvas, RANGE_HEIGHT);
   context.clearRect(0, 0, width, height);
 
-  const labels = getCurrentRangeLabels();
-  const summary = [
-    labels.blackStart,
-    labels.orange,
-    labels.green,
-    labels.blue,
-    labels.pink,
-    labels.blackEnd
-  ].join("   ");
-
-  // Faixa clara exclusiva para os intervalos atuais.
-  // Isso evita texto escuro sobre o fundo preto do canvas.
-  context.fillStyle = "#ffffff";
-  context.fillRect(0, 0, width, 18);
-
-  context.fillStyle = "#111111";
-  context.font = "600 12px Arial, sans-serif";
-  context.textAlign = "left";
-  context.textBaseline = "top";
-  context.fillText(summary, MARGIN, 1);
-
-  const barTop = 18;
+  const barTop = 0;
   const barBottom = height - 1;
 
   for (const [start, end, color] of getRanges()) {
@@ -199,6 +218,7 @@ function drawRangeBar() {
     context.moveTo(x, barTop);
     context.lineTo(x, barBottom);
     context.stroke();
+
     context.strokeStyle = "#111";
     context.lineWidth = 1;
     context.beginPath();
