@@ -18,7 +18,7 @@ import {
 import { state } from "./state.js";
 import { resetSelection, setStatus } from "./ui.js";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
-import { initializeEffectsCanvas, updateEffectsImage, drawEffectsControls, resetEffectsRanges } from "./effects.js?v=62";
+import { initializeEffectsCanvas, updateEffectsImage, drawEffectsControls } from "./effects.js?v=65";
 
 
 function ensureRestoreState() {
@@ -247,6 +247,9 @@ export async function loadXrayOnlyFromSource(xraySrc, xrayFileName) {
     hemdCtx.clearRect(0, 0, width, height);
 
     state.originalImageData = ctx.getImageData(0, 0, width, height);
+    // Cópia imutável e exclusiva da tela Effects. Nenhuma rotina da X-RAY
+    // recebe referência para este buffer.
+    state.effectsSourceImageData = cloneImageData(state.originalImageData);
     state.currentImageData = cloneImageData(state.originalImageData);
     state.hemdImageData = null;
     state.currentFileName = xrayFileName;
@@ -257,11 +260,6 @@ export async function loadXrayOnlyFromSource(xraySrc, xrayFileName) {
     state.currentDetectorBoxes = [];
     state.fftDetectorBoxes = [];
     state.suspectBoxes = [];
-
-    // Toda nova X-RAY inicia na visualização original e restaura somente
-    // os ranges do Effects para os valores-padrão. As configurações gerais
-    // do sistema permanecem inalteradas.
-    resetEffectsRanges();
 
     bboxInfoText.textContent = "nenhum";
     resetSelection();
@@ -327,6 +325,9 @@ export async function loadImagePairFromSources(xraySrc, hemdSrc, xrayFileName, h
     hemdCtx.drawImage(hemdImg, 0, 0, width, height);
 
     state.originalImageData = ctx.getImageData(0, 0, width, height);
+    // Cópia imutável e exclusiva da tela Effects. Nenhuma rotina da X-RAY
+    // recebe referência para este buffer.
+    state.effectsSourceImageData = cloneImageData(state.originalImageData);
     state.currentImageData = cloneImageData(state.originalImageData);
     state.hemdImageData = hemdCtx.getImageData(0, 0, width, height);
     state.currentFileName = xrayFileName;
@@ -337,11 +338,6 @@ export async function loadImagePairFromSources(xraySrc, hemdSrc, xrayFileName, h
     state.currentDetectorBoxes = [];
     state.fftDetectorBoxes = [];
     state.suspectBoxes = [];
-
-    // Toda nova X-RAY inicia na visualização original e restaura somente
-    // os ranges do Effects para os valores-padrão. As configurações gerais
-    // do sistema permanecem inalteradas.
-    resetEffectsRanges();
 
     bboxInfoText.textContent = "nenhum";
     resetSelection();

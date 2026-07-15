@@ -75,9 +75,12 @@ export function initializeEffectsCanvas(width, height) {
 }
 
 export function updateEffectsImage() {
-  if (!state.currentImageData || !effectsCanvas.width || !effectsCanvas.height) return;
+  if (!state.effectsSourceImageData || !effectsCanvas.width || !effectsCanvas.height) return;
 
-  const source = state.currentImageData;
+  // Effects possui uma fonte independente: sempre parte de uma cópia exclusiva da X-RAY original.
+  // Equalização local, bounding boxes e demais alterações em currentImageData
+  // não podem modificar esta visualização.
+  const source = state.effectsSourceImageData;
   const output = new ImageData(source.width, source.height);
   const src = source.data;
   const dst = output.data;
@@ -159,8 +162,10 @@ function drawRangeBar() {
 
 function calculateHistogram() {
   const histogram = new Uint32Array(256);
-  if (!state.currentImageData) return histogram;
-  const data = state.currentImageData.data;
+  if (!state.effectsSourceImageData) return histogram;
+  // O histograma de Effects também é calculado exclusivamente sobre
+  // a cópia exclusiva da imagem X-RAY original, mantendo as janelas totalmente isoladas.
+  const data = state.effectsSourceImageData.data;
   for (let i = 0; i < data.length; i += 4) histogram[grayAt(data, i)]++;
   return histogram;
 }
@@ -198,7 +203,7 @@ function drawHistogram() {
 }
 
 export function drawEffectsControls() {
-  if (effectsPanel.hidden || !state.currentImageData) return;
+  if (effectsPanel.hidden || !state.effectsSourceImageData) return;
   drawRangeBar();
   drawHistogram();
 }
