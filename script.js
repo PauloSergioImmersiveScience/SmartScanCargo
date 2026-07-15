@@ -19,10 +19,12 @@ import {
   btnSuspect,
   btnShowHemd,
   btnShowXray,
+  btnEffects,
   btnReport
-} from "./scripts/dom.js?v=40";
+} from "./scripts/dom.js?v=62";
 
 import { state } from "./scripts/state.js";
+import { initializeEffectsUI } from "./scripts/effects.js?v=62";
 import { setStatus, resetSelection } from "./scripts/ui.js";
 import {
   getCanvasPoint,
@@ -202,6 +204,7 @@ ensureRestoreState();
 
 btnShowHemd.addEventListener("click", () => showImageView("hemd"));
 btnShowXray.addEventListener("click", () => showImageView("xray"));
+btnEffects.addEventListener("click", () => showImageView("effects"));
 
 imageCanvas.addEventListener("click", (event) => {
   if (state.activeView !== "xray") return;
@@ -303,5 +306,6 @@ window.addEventListener("keydown", (event) => {
 
 window.addEventListener("resize", redrawCanvas);
 
+initializeEffectsUI();
 updateViewButtons();
 restoreLoginState();
