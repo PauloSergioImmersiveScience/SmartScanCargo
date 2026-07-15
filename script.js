@@ -16,6 +16,7 @@ import {
   hemdCanvas,
   effectsCanvas,
   effectsPanel,
+  hemdPalettePanel,
   imageNameText,
   bboxInfoText,
   pointsCountText,
@@ -26,10 +27,10 @@ import {
   btnShowXray,
   btnEffects,
   btnReport
-} from "./scripts/dom.js?v=62";
+} from "./scripts/dom.js?v=63";
 
 import { state } from "./scripts/state.js";
-import { initializeEffectsUI, resetEffectsRanges } from "./scripts/effects.js?v=70";
+import { initializeEffectsUI, resetEffectsRanges } from "./scripts/effects.js?v=71";
 import { setStatus, resetSelection } from "./scripts/ui.js";
 import {
   getCanvasPoint,
@@ -41,7 +42,7 @@ import {
   downloadEqualizedImage,
   showImageView,
   updateViewButtons
-} from "./scripts/imagem.js?v=65";
+} from "./scripts/imagem.js?v=71";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
 import { findPossibleSuspectRegions } from "./scripts/detector.js?v=40";
 import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=40";
@@ -103,6 +104,7 @@ function resetApplicationSession() {
   hemdCanvas.setAttribute("aria-hidden", "true");
   effectsCanvas.setAttribute("aria-hidden", "true");
   effectsPanel.hidden = true;
+  hemdPalettePanel.hidden = true;
 
   imageNameText.textContent = "nenhuma imagem carregada";
   pointsCountText.textContent = "0";

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SmartSCargo - Local Enhance</title>
+  <title>SmartSCargo - Equalização Local</title>
   <link rel="stylesheet" href="style.css?v=20260715-63" />
 </head>
 <body>
@@ -42,7 +42,7 @@
           />
         </div>
         <p class="descricao">
-          Define a bounding box with the left mouse button to enhance contrast. Restore everything using the “Restore Original” button.
+          Clique em dois pontos para equalizar uma região livremente ou use a detecção automática para visualizar possíveis regiões suspeitas.
         </p>
       </div>
       <button id="btnLogout" class="btn ghost">Sair</button>
@@ -131,8 +131,12 @@
       <button id="btnReport" class="btn report" disabled>Emitir Relatório</button>
     </section>
 
+    <section id="hemdPalettePanel" class="hemd-palette-panel" hidden>
+      <canvas id="hemdPaletteCanvas" aria-label="Paleta de cores para imagens HEMD"></canvas>
+    </section>
+
     <section id="effectsPanel" class="effects-panel" hidden>
-      <p class="effects-hint">Drag the white vertical lines to increase/decrease the horizontal luminance bars. Click the "Restore original" button to return to the initial values.</p>
+      <p class="effects-hint">Arraste as divisórias brancas para ampliar ou reduzir as faixas. Clique com o botão direito para restaurar os valores iniciais.</p>
       <canvas id="effectsRangeCanvas" aria-label="Faixas de cores ajustáveis"></canvas>
       <canvas id="effectsHistogramCanvas" aria-label="Histograma da imagem"></canvas>
       <canvas id="effectsPaletteCanvas" aria-label="Paleta de cores para imagens HEMD"></canvas>
@@ -372,6 +376,6 @@
   </div>
 
   <script src="https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-  <script type="module" src="script.js?v=70"></script>
+  <script type="module" src="script.js?v=71"></script>
 </body>
 </html>

@@ -876,6 +876,26 @@ body.modal-open {
   background: #1f6feb;
 }
 
+
+.hemd-palette-panel {
+  width: 100%;
+  margin: 4px 0 10px;
+}
+
+.hemd-palette-panel[hidden] {
+  display: none;
+}
+
+.hemd-palette-panel canvas {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  background: #ffffff;
+  border: 1px solid #707070;
+  cursor: default;
+}
+
 .effects-panel {
   width: 100%;
   margin: 4px 0 10px;
