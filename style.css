@@ -901,7 +901,9 @@ body.modal-open {
 }
 
 .effects-hint {
-  margin: -2px 2px 4px;
-  font-size: 12px;
-  color: #526176;
+  margin: 0 2px 4px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #171717;
 }
