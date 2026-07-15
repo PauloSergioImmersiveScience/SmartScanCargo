@@ -1,19 +1,24 @@
 import {
   imageCanvas,
   hemdCanvas,
+  effectsCanvas,
+  effectsPanel,
   ctx,
   hemdCtx,
   imageNameText,
   bboxInfoText,
   btnShowHemd,
   btnShowXray,
+  btnEffects,
   btnSuspect,
+  btnReport,
   hemdMissingModal,
   btnCloseHemdModal
-} from "./dom.js?v=40";
+} from "./dom.js?v=62";
 import { state } from "./state.js";
 import { resetSelection, setStatus } from "./ui.js";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
+import { initializeEffectsCanvas, updateEffectsImage, drawEffectsControls } from "./effects.js?v=62";
 
 
 function ensureRestoreState() {
@@ -63,12 +68,17 @@ export function getCanvasPoint(event) {
 export function updateViewButtons() {
   const hasXray = Boolean(state.currentImageData);
   const showingXray = state.activeView === "xray";
+  const showingEffects = state.activeView === "effects";
 
-  // O botão HEMD continua disponível quando existe uma X-RAY carregada.
-  // Caso a HEMD não exista, ele abre uma tela informativa no lugar da imagem.
+  // Preserva o comportamento original dos botões HEMD e X-RAY.
   btnShowHemd.disabled = !hasXray || !showingXray;
   btnShowXray.disabled = !hasXray || showingXray;
+
+  // Effects fica disponível após o carregamento da X-RAY.
+  btnEffects.disabled = !hasXray || showingEffects;
   btnSuspect.disabled = !hasXray || !showingXray;
+
+  btnReport.disabled = !(state.suspectBoxes?.length > 0);
 }
 
 function openMissingHemdModal() {
@@ -108,13 +118,23 @@ export function showImageView(view) {
     return;
   }
 
-  state.activeView = view === "hemd" ? "hemd" : "xray";
+  state.activeView = ["hemd", "effects"].includes(view) ? view : "xray";
   const showingXray = state.activeView === "xray";
+  const showingHemd = state.activeView === "hemd";
+  const showingEffects = state.activeView === "effects";
 
   imageCanvas.classList.toggle("canvas-visible", showingXray);
-  hemdCanvas.classList.toggle("canvas-visible", !showingXray);
+  hemdCanvas.classList.toggle("canvas-visible", showingHemd);
+  effectsCanvas.classList.toggle("canvas-visible", showingEffects);
   imageCanvas.setAttribute("aria-hidden", String(!showingXray));
-  hemdCanvas.setAttribute("aria-hidden", String(showingXray));
+  hemdCanvas.setAttribute("aria-hidden", String(!showingHemd));
+  effectsCanvas.setAttribute("aria-hidden", String(!showingEffects));
+  effectsPanel.hidden = !showingEffects;
+
+  if (showingEffects) {
+    updateEffectsImage();
+    requestAnimationFrame(drawEffectsControls);
+  }
 
   resetSelection();
   updateViewButtons();
@@ -122,9 +142,12 @@ export function showImageView(view) {
   if (showingXray) {
     imageNameText.textContent = state.currentFileName;
     setStatus("Visualizando a imagem X-RAY.");
-  } else {
+  } else if (showingHemd) {
     imageNameText.textContent = state.hemdFileName;
     setStatus("Visualizando a imagem HEMD.");
+  } else {
+    imageNameText.textContent = state.currentFileName;
+    setStatus("Visualizando Effects: arraste as divisórias das faixas de intensidade.");
   }
 }
 
@@ -132,7 +155,13 @@ export function redrawCanvas() {
   ensureRestoreState();
   if (!state.currentImageData) return;
 
+  // Reinicia explicitamente os estilos do canvas.
+  // Isso impede que qualquer tracejado de versões anteriores permaneça ativo.
+  ctx.setLineDash([]);
+  ctx.lineDashOffset = 0;
+  ctx.globalAlpha = 1;
   ctx.putImageData(state.currentImageData, 0, 0);
+  updateEffectsImage();
 
   if (state.suspectBoxes?.length > 0) {
     ctx.save();
@@ -209,6 +238,7 @@ export async function loadXrayOnlyFromSource(xraySrc, xrayFileName) {
     imageCanvas.height = height;
     hemdCanvas.width = width;
     hemdCanvas.height = height;
+    initializeEffectsCanvas(width, height);
 
     ctx.clearRect(0, 0, width, height);
     ctx.drawImage(xrayImg, 0, 0, width, height);
@@ -280,6 +310,7 @@ export async function loadImagePairFromSources(xraySrc, hemdSrc, xrayFileName, h
     imageCanvas.height = height;
     hemdCanvas.width = width;
     hemdCanvas.height = height;
+    initializeEffectsCanvas(width, height);
 
     ctx.clearRect(0, 0, width, height);
     ctx.drawImage(xrayImg, 0, 0, width, height);
@@ -444,11 +475,12 @@ export function restoreBoundingBoxRegion(p1, p2) {
   );
 
   state.lastBox = null;
-  state.lastRestoreBox = box;
+  state.lastRestoreBox = null;
   resetRestoreSelectionLocal();
   redrawCanvas();
 
   const remaining = state.suspectBoxes.length;
+  updateViewButtons();
   setStatus(
     `Região restaurada ao original. Os bounding boxes interceptados foram ` +
     `recortados; restam ${remaining} região(ões) marcada(s).`
@@ -468,6 +500,7 @@ export function restoreOriginalImage() {
 
   resetSelection();
   redrawCanvas();
+  updateEffectsImage();
   setStatus("Imagem X-RAY original restaurada.");
 }
 
