@@ -95,13 +95,9 @@ function updateRangeSummary() {
   ensureEffectsState();
 
   const element = ensureRangeSummaryElement();
-  const width = effectsRangeCanvas.getBoundingClientRect().width
-    || effectsPanel.clientWidth
-    || 800;
-  const usableWidth = Math.max(1, width - 2 * MARGIN);
-
   const labels = getCurrentRangeLabels();
   const [orangeStart, orangeEnd, greenEnd, blueEnd, pinkEnd] = state.effectsThresholds;
+
   const ranges = [
     [0, orangeStart - 1, labels.blackStart],
     [orangeStart, orangeEnd, labels.orange],
@@ -112,21 +108,30 @@ function updateRangeSummary() {
   ];
 
   element.replaceChildren();
+  element.style.display = "flex";
+  element.style.alignItems = "center";
+  element.style.paddingLeft = `${MARGIN}px`;
+  element.style.paddingRight = `${MARGIN}px`;
+  element.style.overflow = "hidden";
 
   for (const [start, end, text] of ranges) {
     if (start > end) continue;
 
-    const centerIntensity = (start + end + 1) / 2;
-    const centerX = MARGIN + (centerIntensity / 256) * usableWidth;
-
     const label = document.createElement("span");
     label.textContent = text;
-    label.style.position = "absolute";
-    label.style.left = `${centerX}px`;
-    label.style.top = "0";
-    label.style.transform = "translateX(-50%)";
+
+    // Cada texto ocupa exatamente a largura proporcional da sua faixa.
+    // Desse modo, permanece centralizado sobre o botão correspondente,
+    // mesmo depois que as divisórias são arrastadas.
+    label.style.flex = `0 0 ${((end - start + 1) / 256) * 100}%`;
+    label.style.minWidth = "0";
+    label.style.boxSizing = "border-box";
     label.style.textAlign = "center";
     label.style.color = "#111111";
+    label.style.font = "600 10px Arial, sans-serif";
+    label.style.lineHeight = "20px";
+    label.style.whiteSpace = "nowrap";
+    label.style.overflow = "visible";
     label.style.pointerEvents = "none";
 
     element.appendChild(label);
