@@ -1,5 +1,5 @@
-import { imageCanvas } from "./dom.js?v=80";
-import { state } from "./state.js?v=80";
+import { imageCanvas } from "./dom.js?v=40";
+import { state } from "./state.js";
 import { setStatus } from "./ui.js";
 
 function sanitizeFileName(name) {

@@ -12,15 +12,16 @@ import {
   btnShowXray,
   btnEffects,
   btnSuspect,
-  btnManual,
   btnReport,
   hemdMissingModal,
   btnCloseHemdModal
-} from "./dom.js?v=80";
-import { state } from "./state.js?v=80";
+} from "./dom.js?v=63";
+import { state } from "./state.js";
 import { resetSelection, setStatus } from "./ui.js";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
 import { initializeEffectsCanvas, updateEffectsImage, drawEffectsControls, drawHemdPalette } from "./effects.js?v=71";
+
+const btnManual = document.getElementById("btnManual");
 
 
 function ensureRestoreState() {

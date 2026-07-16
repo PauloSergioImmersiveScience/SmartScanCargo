@@ -1,5 +1,5 @@
-import { state } from "./state.js?v=80";
-import { redrawCanvas } from "./imagem.js?v=80";
+import { state } from "./state.js";
+import { redrawCanvas } from "./imagem.js";
 import { setStatus } from "./ui.js";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
 
