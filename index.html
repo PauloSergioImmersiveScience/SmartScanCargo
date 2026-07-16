@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmartSCargo - Equalização Local</title>
-  <link rel="stylesheet" href="style.css?v=20260715-63" />
+  <link rel="stylesheet" href="style.css?v=20260716-80" />
 </head>
 <body>
   <section id="loginScreen" class="login-screen">
@@ -124,7 +124,8 @@
 
     <section class="analysis-actions">
       <button id="btnConfig" class="btn config-button">Configuração</button>
-      <button id="btnSuspect" class="btn danger">Possible Suspected Regions</button>
+      <button id="btnManual" class="btn manual-detection">Manual Detection</button>
+      <button id="btnSuspect" class="btn danger">Automatic Detection</button>
       <button id="btnShowHemd" class="btn view-toggle" disabled>HEMD</button>
       <button id="btnShowXray" class="btn view-toggle" disabled>X-RAY</button>
       <button id="btnEffects" class="btn view-toggle" disabled>Effects</button>
@@ -150,7 +151,8 @@
         <li><strong>Clique esquerdo 1:</strong> define o ponto p1.</li>
         <li><strong>Clique esquerdo 2:</strong> define o ponto p2 e equaliza o bounding box.</li>
         <li><strong>Clique direito:</strong> restaura a imagem original.</li>
-        <li><strong>Possible Suspected Regions:</strong> executa o algoritmo atual e a análise FFT, mostrando os bounding boxes vermelhos sobrepostos dentro da região R.</li>
+        <li><strong>Manual Detection:</strong> ative o botão e use dois cliques esquerdos para definir um bounding box. Um clique direito remove o último bounding box manual.</li>
+        <li><strong>Automatic Detection:</strong> executa o algoritmo atual e a análise FFT, mostrando os bounding boxes vermelhos sobrepostos dentro da região R.</li>
         <li><strong>HEMD / X-RAY:</strong> alterna entre as duas imagens associadas, exibindo somente uma por vez.</li>
         <li><strong>Effects:</strong> exibe a terceira imagem segmentada por faixas de intensidade e os controles de cores/histograma.</li>
         <li><strong>Emitir Relatório:</strong> reservado para uma implementação futura.</li>
@@ -376,6 +378,6 @@
   </div>
 
   <script src="https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-  <script type="module" src="script.js?v=71"></script>
+  <script type="module" src="script.js?v=80"></script>
 </body>
 </html>

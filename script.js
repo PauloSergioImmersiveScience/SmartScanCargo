@@ -23,13 +23,14 @@ import {
   btnRestore,
   btnDownload,
   btnSuspect,
+  btnManual,
   btnShowHemd,
   btnShowXray,
   btnEffects,
   btnReport
-} from "./scripts/dom.js?v=63";
+} from "./scripts/dom.js?v=80";
 
-import { state } from "./scripts/state.js";
+import { state } from "./scripts/state.js?v=80";
 import { initializeEffectsUI, resetEffectsRanges } from "./scripts/effects.js?v=71";
 import { setStatus, resetSelection } from "./scripts/ui.js";
 import {
@@ -42,13 +43,13 @@ import {
   downloadEqualizedImage,
   showImageView,
   updateViewButtons
-} from "./scripts/imagem.js?v=71";
+} from "./scripts/imagem.js?v=80";
 import { equalizeBoundingBox } from "./scripts/equalizacao.js";
-import { findPossibleSuspectRegions } from "./scripts/detector.js?v=40";
-import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=40";
+import { findPossibleSuspectRegions } from "./scripts/detector.js?v=80";
+import { findFftSuspectRegions } from "./scripts/fft_detector.js?v=80";
 import { EXAMPLE_IMAGES, EXAMPLE_IMAGES_DIRECTORY } from "./scripts/examples.js?v=2";
 import { checkPassword, lockApp, restoreLoginState } from "./scripts/login.js";
-import { generateCurrentAnalysisReport } from "./scripts/report.js?v=54";
+import { generateCurrentAnalysisReport } from "./scripts/report.js?v=80";
 
 btnLogin.addEventListener("click", checkPassword);
 passwordInput.addEventListener("keydown", (event) => {
@@ -73,6 +74,12 @@ function resetApplicationSession() {
   state.currentDetectorBoxes = [];
   state.fftDetectorBoxes = [];
   state.suspectBoxes = [];
+  state.manualBoxes = [];
+  state.manualDetectionActive = false;
+  state.manualPoints = [];
+  state.manualPreviewPoint = null;
+  btnManual.classList.remove("active");
+  btnManual.setAttribute("aria-pressed", "false");
   state.currentFileName = "";
   state.hemdFileName = "";
 
@@ -287,6 +294,36 @@ imageCanvas.addEventListener("click", (event) => {
   const point = getCanvasPoint(event);
   if (!point || !state.currentImageData) return;
 
+  if (state.manualDetectionActive) {
+    state.manualPoints.push(point);
+    state.manualPreviewPoint = point;
+    if (state.manualPoints.length === 1) {
+      setStatus(`Primeiro ponto manual: (${point.x}, ${point.y}). Clique no canto oposto.`);
+    } else {
+      const [p1, p2] = state.manualPoints;
+      const xMin = Math.min(p1.x, p2.x);
+      const xMax = Math.max(p1.x, p2.x);
+      const yMin = Math.min(p1.y, p2.y);
+      const yMax = Math.max(p1.y, p2.y);
+      if (xMax > xMin && yMax > yMin) {
+        state.manualBoxes.push({ source: "manual", suspicionPercent: 0, xMin, xMax, yMin, yMax });
+        state.suspectBoxes = [
+          ...(state.currentDetectorBoxes || []),
+          ...(state.fftDetectorBoxes || []),
+          ...state.manualBoxes
+        ];
+        setStatus(`Bounding box manual ${state.manualBoxes.length} criado e incluído no relatório.`);
+      } else {
+        setStatus("Bounding box inválido. Os dois pontos precisam formar uma área.");
+      }
+      state.manualPoints = [];
+      state.manualPreviewPoint = null;
+      updateViewButtons();
+    }
+    redrawCanvas();
+    return;
+  }
+
   resetRestoreSelectionLocal();
   state.lastRestoreBox = null;
   state.selectedPoints.push(point);
@@ -312,6 +349,21 @@ imageCanvas.addEventListener("contextmenu", (event) => {
   event.preventDefault();
 
   if (state.activeView !== "xray" || !state.currentImageData) return;
+
+  if (state.manualDetectionActive) {
+    state.manualPoints = [];
+    state.manualPreviewPoint = null;
+    const removed = state.manualBoxes.pop();
+    state.suspectBoxes = [
+      ...(state.currentDetectorBoxes || []),
+      ...(state.fftDetectorBoxes || []),
+      ...state.manualBoxes
+    ];
+    setStatus(removed ? "Último bounding box manual removido." : "Não há bounding box manual para remover.");
+    updateViewButtons();
+    redrawCanvas();
+    return;
+  }
 
   const point = getCanvasPoint(event);
   if (!point) return;
@@ -346,6 +398,20 @@ btnRestore.addEventListener("click", () => {
   }
 
   restoreOriginalImage();
+});
+
+btnManual.addEventListener("click", () => {
+  if (!state.currentImageData || state.activeView !== "xray") return;
+  state.manualDetectionActive = !state.manualDetectionActive;
+  state.manualPoints = [];
+  state.manualPreviewPoint = null;
+  btnManual.classList.toggle("active", state.manualDetectionActive);
+  btnManual.setAttribute("aria-pressed", String(state.manualDetectionActive));
+  resetSelection();
+  redrawCanvas();
+  setStatus(state.manualDetectionActive
+    ? "Detecção manual ativada. Clique em dois cantos opostos do bounding box."
+    : "Detecção manual desativada.");
 });
 
 btnSuspect.addEventListener("click", async () => {

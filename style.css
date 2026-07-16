@@ -518,6 +518,17 @@ canvas {
   font-size: 14px;
 }
 
+.manual-detection {
+  min-width: 150px;
+  background: #1f6feb;
+}
+
+.manual-detection.active {
+  background: #22b950;
+  color: #07150b;
+  box-shadow: 0 0 0 3px rgba(34, 185, 80, 0.22);
+}
+
 .view-toggle {
   min-width: 82px;
   background: #1f6feb;
@@ -540,7 +551,8 @@ canvas {
   }
 
   .analysis-actions .btn,
-  .analysis-actions #btnSuspect {
+  .analysis-actions #btnSuspect,
+  .analysis-actions #btnManual {
     width: 100% !important;
   }
 }
