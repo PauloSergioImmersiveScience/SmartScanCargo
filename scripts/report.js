@@ -74,7 +74,7 @@ export async function generateCurrentAnalysisReport() {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text("SmartSCargo — Relatório de Regiões Suspeitas", margin, 15);
+    doc.text("SmartScanCargo — Relatório de Regiões Suspeitas", margin, 15);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
@@ -126,7 +126,7 @@ export async function generateCurrentAnalysisReport() {
       });
     }
 
-    const outputName = `Relatorio_SmartSCargo_${sanitizeFileName(state.currentFileName)}.pdf`;
+    const outputName = `Relatorio_SmartScanCargo_${sanitizeFileName(state.currentFileName)}.pdf`;
     doc.save(outputName);
     setStatus(`Relatório gerado: ${outputName}`);
   } catch (error) {
