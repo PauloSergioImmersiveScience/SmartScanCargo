@@ -1,6 +1,6 @@
-import { imageCanvas } from "./dom.js";
-import { state } from "./state.js";
-import { redrawCanvas } from "./imagem.js";
+import { imageCanvas } from "./dom.js?v=80";
+import { state } from "./state.js?v=80";
+import { redrawCanvas } from "./imagem.js?v=80";
 import { setStatus } from "./ui.js";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
 
@@ -432,7 +432,7 @@ export async function findPossibleSuspectRegions() {
   try {
     const result = detectCurrentAlgorithmBoxes(state.currentImageData);
     state.currentDetectorBoxes = result.boxes;
-    state.suspectBoxes = [...state.currentDetectorBoxes, ...(state.fftDetectorBoxes || [])];
+    state.suspectBoxes = [...state.currentDetectorBoxes, ...(state.fftDetectorBoxes || []), ...(state.manualBoxes || [])];
     redrawCanvas();
 
     if (!result.boxes.length) {
@@ -449,7 +449,7 @@ export async function findPossibleSuspectRegions() {
   } catch (error) {
     console.error(error);
     state.currentDetectorBoxes = [];
-    state.suspectBoxes = [...(state.fftDetectorBoxes || [])];
+    state.suspectBoxes = [...(state.fftDetectorBoxes || []), ...(state.manualBoxes || [])];
     redrawCanvas();
     setStatus(`Não foi possível executar a detecção: ${error.message}`);
     return null;
@@ -459,6 +459,6 @@ export async function findPossibleSuspectRegions() {
 export function clearSuspectRegions() {
   state.currentDetectorBoxes = [];
   state.fftDetectorBoxes = [];
-  state.suspectBoxes = [];
+  state.suspectBoxes = [...(state.manualBoxes || [])];
   redrawCanvas();
 }

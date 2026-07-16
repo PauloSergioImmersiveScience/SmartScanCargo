@@ -34,6 +34,7 @@ export const statusText = document.getElementById("statusText");
 export const btnRestore = document.getElementById("btnRestore");
 export const btnDownload = document.getElementById("btnDownload");
 export const btnSuspect = document.getElementById("btnSuspect");
+export const btnManual = document.getElementById("btnManual");
 export const btnShowHemd = document.getElementById("btnShowHemd");
 export const btnShowXray = document.getElementById("btnShowXray");
 export const btnEffects = document.getElementById("btnEffects");
@@ -51,4 +52,3 @@ export const btnConfigDefaults = document.getElementById("btnConfigDefaults");
 export const configForm = document.getElementById("configForm");
 export const configValidation = document.getElementById("configValidation");
 export const configActiveLabel = document.getElementById("configActiveLabel");
-

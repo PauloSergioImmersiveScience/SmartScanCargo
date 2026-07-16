@@ -14,5 +14,9 @@ export const state = {
   currentDetectorBoxes: [],
   fftDetectorBoxes: [],
   suspectBoxes: [],
+  manualBoxes: [],
+  manualDetectionActive: false,
+  manualPoints: [],
+  manualPreviewPoint: null,
   currentFileName: ""
 };

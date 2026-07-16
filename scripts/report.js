@@ -1,5 +1,5 @@
-import { imageCanvas } from "./dom.js?v=40";
-import { state } from "./state.js";
+import { imageCanvas } from "./dom.js?v=80";
+import { state } from "./state.js?v=80";
 import { setStatus } from "./ui.js";
 
 function sanitizeFileName(name) {
@@ -24,16 +24,18 @@ function fitInside(sourceWidth, sourceHeight, maxWidth, maxHeight) {
 }
 
 function boxLabel(box, index) {
-  const prefix = box.source === "fft" ? "FFT" : "BB";
+  const prefix = box.source === "fft" ? "FFT" : box.source === "manual" ? "Manual" : "BB";
   const displayedName = `${prefix} ${index + 1}`;
-  const percentage = Number.isFinite(box.suspicionPercent)
+  const percentage = box.source === "manual" ? null : Number.isFinite(box.suspicionPercent)
     ? box.suspicionPercent
     : 0;
 
   return {
     title: displayedName,
     percentage,
-    comment: `Percentual de suspeita de ${displayedName}: ${percentage}%. Este percentual é calculado a partir do score normalizado produzido pelo algoritmo responsável por esta região.`
+    comment: box.source === "manual"
+      ? `${displayedName}: região definida manualmente pelo usuário.`
+      : `Percentual de suspeita de ${displayedName}: ${percentage}%. Este percentual é calculado a partir do score normalizado produzido pelo algoritmo responsável por esta região.`
   };
 }
 

@@ -1,5 +1,5 @@
-import { state } from "./state.js";
-import { redrawCanvas } from "./imagem.js";
+import { state } from "./state.js?v=80";
+import { redrawCanvas } from "./imagem.js?v=80";
 import { setStatus } from "./ui.js";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
 
@@ -311,7 +311,7 @@ export async function findFftSuspectRegions(regionR) {
   if (!state.currentImageData) return [];
   const boxes = await detectFftBoxes(state.currentImageData, regionR);
   state.fftDetectorBoxes = boxes;
-  state.suspectBoxes = [...(state.currentDetectorBoxes || []), ...boxes];
+  state.suspectBoxes = [...(state.currentDetectorBoxes || []), ...boxes, ...(state.manualBoxes || [])];
   redrawCanvas();
   return boxes;
 }

@@ -12,11 +12,12 @@ import {
   btnShowXray,
   btnEffects,
   btnSuspect,
+  btnManual,
   btnReport,
   hemdMissingModal,
   btnCloseHemdModal
-} from "./dom.js?v=63";
-import { state } from "./state.js";
+} from "./dom.js?v=80";
+import { state } from "./state.js?v=80";
 import { resetSelection, setStatus } from "./ui.js";
 import { getAlgorithmConfig } from "./algorithm_config.js?v=40";
 import { initializeEffectsCanvas, updateEffectsImage, drawEffectsControls, drawHemdPalette } from "./effects.js?v=71";
@@ -101,6 +102,7 @@ export function updateViewButtons() {
   // Effects fica disponível após o carregamento da X-RAY.
   btnEffects.disabled = !hasXray || showingEffects;
   btnSuspect.disabled = !hasXray || !showingXray;
+  btnManual.disabled = !hasXray || !showingXray;
 
   btnReport.disabled = !(state.suspectBoxes?.length > 0);
 }
@@ -143,6 +145,13 @@ export function showImageView(view) {
   }
 
   state.activeView = ["hemd", "effects"].includes(view) ? view : "xray";
+  if (state.activeView !== "xray") {
+    state.manualDetectionActive = false;
+    state.manualPoints = [];
+    state.manualPreviewPoint = null;
+    btnManual.classList.remove("active");
+    btnManual.setAttribute("aria-pressed", "false");
+  }
   const showingXray = state.activeView === "xray";
   const showingHemd = state.activeView === "hemd";
   const showingEffects = state.activeView === "effects";
@@ -201,9 +210,21 @@ export function redrawCanvas() {
       const width = box.xMax - box.xMin + 1;
       const height = box.yMax - box.yMin + 1;
       ctx.strokeRect(box.xMin, box.yMin, width, height);
-      const prefix = box.source === "fft" ? "FFT" : "BB";
+      const prefix = box.source === "fft" ? "FFT" : box.source === "manual" ? "Manual" : "BB";
       ctx.fillText(`${prefix} ${index + 1}`, box.xMin + 6, Math.max(18, box.yMin - 8));
     });
+    ctx.restore();
+  }
+
+  if (state.manualPreviewPoint && state.manualDetectionActive) {
+    ctx.save();
+    ctx.fillStyle = "#22c55e";
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = Math.max(1, Math.round(imageCanvas.width / 1200));
+    ctx.beginPath();
+    ctx.arc(state.manualPreviewPoint.x, state.manualPreviewPoint.y, Math.max(4, Math.round(imageCanvas.width / 300)), 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
     ctx.restore();
   }
 
@@ -282,6 +303,11 @@ export async function loadXrayOnlyFromSource(xraySrc, xrayFileName) {
     state.currentDetectorBoxes = [];
     state.fftDetectorBoxes = [];
     state.suspectBoxes = [];
+    state.manualBoxes = [];
+    state.manualDetectionActive = false;
+    state.manualPoints = [];
+    state.manualPreviewPoint = null;
+    btnManual.classList.remove("active");
 
     bboxInfoText.textContent = "nenhum";
     resetSelection();
@@ -358,6 +384,11 @@ export async function loadImagePairFromSources(xraySrc, hemdSrc, xrayFileName, h
     state.currentDetectorBoxes = [];
     state.fftDetectorBoxes = [];
     state.suspectBoxes = [];
+    state.manualBoxes = [];
+    state.manualDetectionActive = false;
+    state.manualPoints = [];
+    state.manualPreviewPoint = null;
+    btnManual.classList.remove("active");
 
     bboxInfoText.textContent = "nenhum";
     resetSelection();
@@ -501,6 +532,10 @@ export function restoreBoundingBoxRegion(p1, p2) {
     state.suspectBoxes,
     box
   );
+  state.manualBoxes = subtractRegionFromBoxes(
+    state.manualBoxes || [],
+    box
+  );
 
   state.lastBox = null;
   state.lastRestoreBox = null;
@@ -524,6 +559,11 @@ export function restoreOriginalImage() {
   state.currentDetectorBoxes = [];
   state.fftDetectorBoxes = [];
   state.suspectBoxes = [];
+  state.manualBoxes = [];
+  state.manualDetectionActive = false;
+  state.manualPoints = [];
+  state.manualPreviewPoint = null;
+  btnManual.classList.remove("active");
   bboxInfoText.textContent = "nenhum";
 
   resetSelection();
