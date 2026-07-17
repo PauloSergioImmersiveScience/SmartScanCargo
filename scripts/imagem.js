@@ -408,9 +408,9 @@ export async function loadImagePairFromSources(xraySrc, hemdSrc, xrayFileName, h
 
 // Mantido por compatibilidade com chamadas antigas.
 export function loadImageFromSource(src, fileName) {
-  const match = fileName.match(/^xray(\d+)(?:_[su]\d+)?\.[^.]+$/i);
+  const match = fileName.match(/^xray(\d+)(?:_[su]\d*)?\.[^.]+$/i);
   if (!match) {
-    setStatus("O arquivo deve seguir xray{i}.ext, xray{i}_s{j}.ext ou xray{i}_u{j}.ext.");
+    setStatus("Use xray{i}.ext, xray{i}_s.ext, xray{i}_s{j}.ext, xray{i}_u.ext ou xray{i}_u{j}.ext.");
     return;
   }
   const hemdName = `hemd${match[1]}.png`;
