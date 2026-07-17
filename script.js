@@ -139,7 +139,7 @@ btnLogout.addEventListener("click", () => {
 });
 
 function extractIndex(fileName, prefix) {
-  const optionalSuffix = prefix.toLowerCase() === "xray" ? "(?:_[su]\\d+)?" : "";
+  const optionalSuffix = prefix.toLowerCase() === "xray" ? "(?:_[su]\\d*)?" : "";
   const match = fileName.match(
     new RegExp(`^${prefix}(\\d+)${optionalSuffix}\\.[^.]+$`, "i")
   );
@@ -203,7 +203,7 @@ imageLoader.addEventListener("change", async (event) => {
 
   const index = extractIndex(file.name, "xray");
   if (!index) {
-    setStatus('Use "xray{i}.ext", "xray{i}_s{j}.ext" ou "xray{i}_u{j}.ext".');
+    setStatus('Use "xray{i}.ext", "xray{i}_s.ext", "xray{i}_s{j}.ext", "xray{i}_u.ext" ou "xray{i}_u{j}.ext".');
     imageLoader.value = "";
     return;
   }
