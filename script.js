@@ -289,6 +289,7 @@ btnLoadExampleHemd.addEventListener("click", async () => {
 
   const url = `${EXAMPLE_IMAGES_DIRECTORY}${encodeURIComponent(example.hemd)}`;
   await loadHemdOnlyFromSource(url, example.hemd);
+  showImageView("hemd");
 });
 
 ensureRestoreState();
