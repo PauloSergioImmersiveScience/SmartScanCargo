@@ -407,6 +407,7 @@ btnRestore.addEventListener("click", () => {
   }
 
   restoreOriginalImage();
+  showImageView("xray");
 });
 
 btnManual.addEventListener("click", () => {
