@@ -156,6 +156,11 @@ select:focus {
 .github-xray-row { grid-area: github-xray; }
 .github-hemd-row { grid-area: github-hemd; }
 
+.local-xray-row .selection-display,
+.local-hemd-row .selection-display {
+  grid-column: 2;
+}
+
 .upload-action {
   display: flex;
   align-items: center;
@@ -381,6 +386,10 @@ canvas {
 }
 
 @media (max-width: 820px) {
+  .local-xray-row .selection-display,
+  .local-hemd-row .selection-display {
+    grid-column: 1;
+  }  
   .toolbar {
     grid-template-columns: 1fr;
     grid-template-areas:
