@@ -5,6 +5,11 @@ export const btnLogin = document.getElementById("btnLogin");
 export const btnLogout = document.getElementById("btnLogout");
 export const loginStatus = document.getElementById("loginStatus");
 
+export const imageLoader = document.getElementById("imageLoader");
+export const hemdLoader = document.getElementById("hemdLoader");
+export const localXrayDisplay = document.getElementById("localXrayDisplay");
+export const localHemdDisplay = document.getElementById("localHemdDisplay");
+
 export const exampleXraySelect = document.getElementById("exampleXraySelect");
 export const exampleHemdSelect = document.getElementById("exampleHemdSelect");
 export const btnLoadExampleXray = document.getElementById("btnLoadExampleXray");
