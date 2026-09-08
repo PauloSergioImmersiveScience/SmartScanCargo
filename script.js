@@ -87,10 +87,16 @@ function resetApplicationSession() {
   btnManual.setAttribute("aria-pressed", "false");
   state.currentFileName = "";
   state.hemdFileName = "";
+
+  imageLoader.value = "";
+  hemdLoader.value = "";
   exampleXraySelect.value = "";
   exampleHemdSelect.value = "";
   btnLoadExampleXray.disabled = true;
   btnLoadExampleHemd.disabled = true;
+
+  setLocalDisplay(localXrayDisplay, "Selecione uma imagem X-RAY");
+  setLocalDisplay(localHemdDisplay, "Selecione uma imagem HEMD correspondente");
 
   imageCanvas.getContext("2d").clearRect(0, 0, imageCanvas.width, imageCanvas.height);
   hemdCanvas.getContext("2d").clearRect(0, 0, hemdCanvas.width, hemdCanvas.height);
@@ -144,6 +150,10 @@ function expectedHemdIndex() {
   return extractIndex(state.currentFileName || "", "xray");
 }
 
+function setLocalDisplay(element, text) {
+  element.textContent = text;
+}
+
 function ensureRestoreState() {
   if (!Array.isArray(state.restorePoints)) state.restorePoints = [];
   if (!("restorePreviewPoint" in state)) state.restorePreviewPoint = null;
@@ -185,6 +195,58 @@ exampleXraySelect.addEventListener("change", () => {
 
 exampleHemdSelect.addEventListener("change", () => {
   btnLoadExampleHemd.disabled = !exampleHemdSelect.value;
+});
+
+imageLoader.addEventListener("change", async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const index = extractIndex(file.name, "xray");
+  if (!index) {
+    setStatus('Use "xray{i}.ext", "xray{i}_s.ext", "xray{i}_s{j}.ext", "xray{i}_u.ext" ou "xray{i}_u{j}.ext".');
+    imageLoader.value = "";
+    return;
+  }
+
+  setLocalDisplay(localXrayDisplay, file.name);
+  const url = URL.createObjectURL(file);
+
+  try {
+    await loadXrayOnlyFromSource(url, file.name);
+    hemdLoader.value = "";
+    setLocalDisplay(localHemdDisplay, "Selecione uma imagem HEMD correspondente");
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+});
+
+hemdLoader.addEventListener("change", async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  if (!state.currentImageData) {
+    setStatus("Carregue primeiro uma imagem X-RAY.");
+    hemdLoader.value = "";
+    return;
+  }
+
+  const hemdIndex = extractIndex(file.name, "hemd");
+  const xrayIndex = expectedHemdIndex();
+
+  if (!hemdIndex || hemdIndex !== xrayIndex) {
+    setStatus(`Selecione a imagem HEMD correspondente: hemd${xrayIndex}.png.`);
+    hemdLoader.value = "";
+    return;
+  }
+
+  setLocalDisplay(localHemdDisplay, file.name);
+  const url = URL.createObjectURL(file);
+
+  try {
+    await loadHemdOnlyFromSource(url, file.name);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 });
 
 btnLoadExampleXray.addEventListener("click", async () => {
